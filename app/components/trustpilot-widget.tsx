@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import Script from 'next/script'
 import { useCookieConsent } from "@/lib/cookie-consent-context"
 
@@ -17,17 +17,17 @@ export function TrustpilotWidget() {
   const { preferences } = useCookieConsent()
   const hasConsent = preferences?.functional === true
 
-  useEffect(() => {
-    const loadTrustpilot = () => {
-      if (hasConsent && window.Trustpilot && ref.current) {
-        window.Trustpilot.loadFromElement(ref.current, true)
-      }
+  const loadTrustpilot = useCallback(() => {
+    if (window.Trustpilot && ref.current) {
+      window.Trustpilot.loadFromElement(ref.current, true)
     }
+  }, [])
 
+  useEffect(() => {
     if (hasConsent) {
       loadTrustpilot()
     }
-  }, [hasConsent])
+  }, [hasConsent, loadTrustpilot])
 
   if (!hasConsent) {
     return null
@@ -57,3 +57,4 @@ export function TrustpilotWidget() {
     </>
   )
 }
+
