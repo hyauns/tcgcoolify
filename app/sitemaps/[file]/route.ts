@@ -34,8 +34,8 @@ export async function GET(
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
 
   for (const product of products) {
-    // Re-use exact same slug calculation
-    const slug = generateSlug(product.name)
+    // Re-use exact same slug calculation or DB slug
+    const slug = product.slug || generateSlug(product.name)
     // Make sure we output ISO string for lastmod
     const lastmod = product.updated_at ? product.updated_at.toISOString() : new Date().toISOString()
     

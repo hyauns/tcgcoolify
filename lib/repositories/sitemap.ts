@@ -5,6 +5,7 @@ import { profileDbQuery } from "../db-profiler"
 export interface SitemapProductRow {
   id: number
   name: string
+  slug: string
   updated_at: Date
 }
 
@@ -46,7 +47,7 @@ export async function getSitemapProductsBatch(offset: number, limit: number): Pr
 
       // Fetch absolute minimum fields required to build localized slugs and <lastmod>
       const rows = await sql`
-        SELECT id, name, COALESCE(updated_at, created_at) as updated_at
+        SELECT id, name, slug, COALESCE(updated_at, created_at) as updated_at
         FROM products
         WHERE is_active = true
         ORDER BY id ASC
@@ -56,6 +57,7 @@ export async function getSitemapProductsBatch(offset: number, limit: number): Pr
       return rows.map((r: any) => ({
         id: r.id,
         name: r.name,
+        slug: r.slug,
         updated_at: new Date(r.updated_at)
       }))
     } catch (error) {

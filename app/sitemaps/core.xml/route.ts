@@ -20,7 +20,6 @@ export async function GET() {
     { url: "/preorder-info", priority: "0.5", changefreq: "weekly" },
     { url: "/payment-and-orders", priority: "0.3", changefreq: "yearly" },
     { url: "/payment", priority: "0.3", changefreq: "yearly" },
-    { url: "/payment-orders", priority: "0.3", changefreq: "yearly" },
   ]
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`
