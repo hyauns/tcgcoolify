@@ -8,6 +8,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  async redirects() {
+    return [
+      {
+        source: '/product/:slug',
+        destination: '/products/:slug',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",

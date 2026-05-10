@@ -108,14 +108,13 @@ function stripHtml(str: string): string {
   return str.replace(/<[^>]*>/g, "").trim()
 }
 
+import { generateSlug } from "@/lib/utils"
+
 /**
  * Build the product slug from the name.
  */
 function buildSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
+  return generateSlug(name)
 }
 
 /**
@@ -216,7 +215,7 @@ function buildItemXml(product: FeedProductRow): string {
     `  <g:id>${product.id}</g:id>\n` +
     `  <g:title>${escapeXml(product.name)}</g:title>\n` +
     `  <g:description>${escapeXml(description)}</g:description>\n` +
-    `  <g:link>${siteUrl}/product/${slug}</g:link>\n` +
+    `  <g:link>${siteUrl}/products/${slug}</g:link>\n` +
     `  <g:image_link>${escapeXml(imageUrl)}</g:image_link>\n` +
     `  <g:price>${price} USD</g:price>\n` +
     `  <g:availability>${availability}</g:availability>\n` +

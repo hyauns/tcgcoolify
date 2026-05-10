@@ -381,7 +381,7 @@ export default function TermsOfService() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/payment-orders" className="text-blue-600 hover:text-blue-800">
+                  <Link href="/payment-and-orders" className="text-blue-600 hover:text-blue-800">
                     Payment & Orders Information
                   </Link>
                 </li>

@@ -58,6 +58,15 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Handle legacy slugs with multiple hyphens (e.g. ---)
+  if (pathname.startsWith("/products/")) {
+    const slug = pathname.substring(10)
+    if (slug && slug.includes("--")) {
+      const cleanSlug = slug.replace(/-+/g, "-")
+      return withSecurityHeaders(NextResponse.redirect(new URL(`/products/${cleanSlug}`, request.url), 301))
+    }
+  }
+
   if (ADMIN_ROUTES.some((route) => pathname.startsWith(route))) {
     const payload = await getPayload()
 

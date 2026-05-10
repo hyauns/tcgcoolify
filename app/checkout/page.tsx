@@ -2356,7 +2356,7 @@ export default function CheckoutPage() {
                 </Label>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1">
                   By opting in, you agree to our {" "}
-                  <a href="https://www.tcglore.com/payment-orders" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 hover:underline font-medium inline-flex items-center gap-1">
+                  <a href="https://www.tcglore.com/payment-and-orders" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 hover:underline font-medium inline-flex items-center gap-1">
                     <Shield className="w-3 h-3 text-blue-600" />
                     Payment Policy 
                     <ArrowRight className="w-3 h-3" />
