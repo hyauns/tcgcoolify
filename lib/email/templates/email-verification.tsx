@@ -20,7 +20,7 @@ export function EmailVerificationTemplate({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Verify Your Email - TCG Lore LLC Company</title>
+        <title>Verify Your Email - TCG Lore</title>
       </head>
       <body
         style={{
@@ -52,7 +52,7 @@ export function EmailVerificationTemplate({
             <h2 style={{ color: "#333", marginTop: 0 }}>Hello {firstName}!</h2>
 
             <p>
-              Thank you for creating an account with TCG Lore LLC Company.! To complete your registration and start shopping for
+              Thank you for creating an account with TCG Lore! To complete your registration and start shopping for
               your favorite trading cards, please verify your email address.
             </p>
 
@@ -125,7 +125,7 @@ export function EmailVerificationTemplate({
               <h3 style={{ margin: "0 0 15px 0", color: "#1976d2" }}>What's Next?</h3>
               <ul style={{ margin: 0, paddingLeft: "20px", color: "#333", fontSize: "14px" }}>
                 <li>Click the verification button above</li>
-                <li>You'll be redirected to TCG Lore LLC Company.</li>
+                <li>You'll be redirected to TCG Lore</li>
                 <li>Start browsing our collection of trading cards</li>
                 <li>Enjoy secure shopping and fast shipping</li>
               </ul>
@@ -138,7 +138,7 @@ export function EmailVerificationTemplate({
             <p style={{ color: "#666", fontSize: "14px" }}>
               Best regards,
               <br />
-              The TCG Lore LLC Company. Team
+              The TCG Lore Team
             </p>
           </div>
 
@@ -152,7 +152,7 @@ export function EmailVerificationTemplate({
               fontSize: "12px",
             }}
           >
-            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG LOR LLC Company.</p>
+            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG Lore</p>
             <p style={{ margin: "4px 0 0 0" }}>
               <a href="mailto:cs@tcglore.com" style={{ color: "#667eea", textDecoration: "none" }}>cs@tcglore.com</a>
             </p>
@@ -160,7 +160,7 @@ export function EmailVerificationTemplate({
               <a href="tel:+13036683245" style={{ color: "#667eea", textDecoration: "none" }}>+1 (303) 668-3245</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore LLC Company. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
           </div>
         </div>
       </body>

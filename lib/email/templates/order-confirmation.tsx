@@ -181,13 +181,13 @@ export function OrderConfirmationTemplate({
             </div>
 
             <p style={{ color: "#666", fontSize: "14px" }}>
-              Thank you for choosing TCG LORE LLC Company for your trading card needs!
+              Thank you for choosing TCG Lore for your trading card needs!
             </p>
 
             <p style={{ color: "#666", fontSize: "14px" }}>
               Best regards,
               <br />
-              The TCG LORE LLC Company. Team
+              The TCG Lore Team
             </p>
           </div>
 
@@ -201,7 +201,7 @@ export function OrderConfirmationTemplate({
               fontSize: "12px",
             }}
           >
-            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG LORE LLC Company.</p>
+            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG Lore</p>
             <p style={{ margin: "4px 0 0 0" }}>
               <a href="mailto:cs@tcglore.com" style={{ color: "#667eea", textDecoration: "none" }}>cs@tcglore.com</a>
             </p>

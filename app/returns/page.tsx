@@ -895,11 +895,14 @@ export default function ReturnsPage() {
 
                 <Separator />
 
-                <div className="text-center">
+                <div className="text-center space-y-4">
                   <p className="text-sm text-gray-600">
                     This return policy is effective as of January 2024 and complies with Google Merchant Center
                     requirements and applicable consumer protection laws. For questions about your rights as a consumer,
                     please contact our customer service team.
+                  </p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
                   </p>
                 </div>
               </CardContent>

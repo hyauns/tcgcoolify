@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   ].join(", "),
   authors: [{ name: "TCG Lore", url: siteUrl }],
   creator: "TCG Lore - Premium Trading Card Games",
-  publisher: "TCG Lore LLC",
+  publisher: "A Toy Haulerz LLC",
   formatDetection: {
     email: false,
     address: false,
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   metadataBase: new URL(siteUrl),
   openGraph: {
     title: settings.seoTitle || "TCG Lore - Premium Trading Cards & Collectibles | Authentic Products",
-    description: settings.seoDescription || "Shop authentic trading cards from Magic: The Gathering, Pokemon, Yu-Gi-Oh! & more. Premium booster packs, rare collectibles, fast shipping & guaranteed authenticity.",
+    description: settings.seoDescription || "Shop authentic trading cards from Magic: The Gathering, Pokemon, Yu-Gi-Oh! & more. Premium booster packs, rare collectibles, and fast shipping.",
     url: siteUrl,
     siteName: "TCG Lore - Premium Trading Card Games",
     images: [
@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
   twitter: {
     card: "summary_large_image",
     title: settings.seoTitle || "TCG Lore - Premium Trading Cards & Collectibles",
-    description: settings.seoDescription || "Shop authentic Magic: The Gathering, Pokemon, Yu-Gi-Oh! cards & more. Premium booster packs, rare collectibles, fast shipping & guaranteed authenticity.",
+    description: settings.seoDescription || "Shop authentic Magic: The Gathering, Pokemon, Yu-Gi-Oh! cards & more. Premium booster packs, rare collectibles, and fast shipping.",
     images: ["/og-image.jpg"],
     creator: "@tcglore",
     site: "@tcglore",
@@ -102,7 +102,7 @@ export default async function RootLayout({
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "TCG Lore",
+    "name": "A Toy Haulerz LLC",
     "alternateName": "TCG Lore",
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,

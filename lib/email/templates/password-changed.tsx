@@ -16,7 +16,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Password Changed - TCG LORE LLC Company</title>
+        <title>Password Changed - TCG Lore</title>
       </head>
       <body
         style={{
@@ -48,7 +48,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
             <h2 style={{ color: "#333", marginTop: 0 }}>Hello {firstName}!</h2>
 
             <p>
-              This is a confirmation that the password for your TCG LORE LLC Company. account <strong>{email}</strong> has been
+              This is a confirmation that the password for your TCG Lore account <strong>{email}</strong> has been
               successfully changed.
             </p>
 
@@ -119,7 +119,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
             <div style={{ background: "#e3f2fd", padding: "20px", borderRadius: "8px", margin: "30px 0" }}>
               <h3 style={{ margin: "0 0 15px 0", color: "#1976d2" }}>Security Tips</h3>
               <ul style={{ margin: 0, paddingLeft: "20px", color: "#333", fontSize: "14px" }}>
-                <li>Use a unique password for your TCG LORE LLC Company. account</li>
+                <li>Use a unique password for your TCG Lore account</li>
                 <li>Consider using a password manager</li>
                 <li>Enable two-factor authentication for extra security</li>
                 <li>Never share your password with anyone</li>
@@ -153,7 +153,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
             <p style={{ color: "#666", fontSize: "14px" }}>
               Best regards,
               <br />
-              The TCG LORE LLC Company. Security Team
+              The TCG Lore Security Team
             </p>
           </div>
 
@@ -167,7 +167,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
               fontSize: "12px",
             }}
           >
-            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG LORE LLC Company.</p>
+            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG Lore</p>
             <p style={{ margin: "4px 0 0 0" }}>
               <a href="mailto:cs@tcglore.com" style={{ color: "#28a745", textDecoration: "none" }}>cs@tcglore.com</a>
             </p>

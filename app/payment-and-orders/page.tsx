@@ -424,6 +424,9 @@ export default function PaymentOrdersPage() {
                 <p className="text-sm text-gray-600 mb-2">TCG Lore<br/>1757 NORTH CENTRAL AVENUE<br/>FLAGLER BEACH, FL 32136</p>
               </div>
             </div>
+            <div className="mt-8 text-center text-sm text-gray-500 font-medium border-t pt-6">
+              TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -253,7 +253,7 @@ export default function AboutPage() {
                     <Shield className="w-8 h-8 text-green-300 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2 text-white">Business Operator</h3>
                     <p className="text-green-200">
-                      TCG Lore
+                      A Toy Haulerz LLC
                     </p>
                   </CardContent>
                 </Card>

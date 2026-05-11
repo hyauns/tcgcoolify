@@ -138,7 +138,7 @@ export default function PreorderPolicy() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700 mb-2">
-                  <strong>Business Operator:</strong> TCG Lore
+                  <strong>Business Operator:</strong> A Toy Haulerz LLC
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Email:</strong> <a href="mailto:cs@tcglore.com" className="text-blue-600 hover:underline">cs@tcglore.com</a>
@@ -148,6 +148,9 @@ export default function PreorderPolicy() {
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Address:</strong> 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136, United States
+                </p>
+                <p className="text-gray-700 mt-4 text-sm font-medium border-t pt-4">
+                  TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
                 </p>
               </div>
             </section>

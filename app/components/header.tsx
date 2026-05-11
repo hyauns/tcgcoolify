@@ -247,7 +247,7 @@ export function Header() {
                 priority
               />
               <p className="text-[10px] text-gray-500 hidden sm:block uppercase tracking-wider font-semibold">
-                Operated by TCG Lore
+                Operated by A Toy Haulerz LLC
               </p>
             </div>
           </Link>

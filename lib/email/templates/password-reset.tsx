@@ -24,7 +24,7 @@ export function PasswordResetTemplate({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Reset Your Password - TCG LORE LLC Company</title>
+        <title>Reset Your Password - TCG Lore</title>
       </head>
       <body
         style={{
@@ -169,7 +169,7 @@ export function PasswordResetTemplate({
             <p style={{ color: "#666", fontSize: "14px" }}>
               Best regards,
               <br />
-              The TCG LORE LLC Company. Security Team
+              The TCG Lore Security Team
             </p>
           </div>
 
@@ -183,7 +183,7 @@ export function PasswordResetTemplate({
               fontSize: "12px",
             }}
           >
-            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG LORE LLC Company.</p>
+            <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px", color: "#444" }}>TCG Lore</p>
             <p style={{ margin: "4px 0 0 0" }}>
               <a href="mailto:cs@tcglore.com" style={{ color: "#dc3545", textDecoration: "none" }}>cs@tcglore.com</a>
             </p>
