@@ -1,7 +1,10 @@
 import { cache } from "react"
 import { neon } from "@neondatabase/serverless"
 
-const sql = neon(process.env.DATABASE_URL!)
+function sql(...args: Parameters<ReturnType<typeof neon>>) {
+  const db = neon(process.env.DATABASE_URL!)
+  return db(...args)
+}
 
 export interface User {
   user_id: string

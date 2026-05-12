@@ -1,9 +1,16 @@
 import { Resend } from "resend"
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy-initialize Resend client to avoid crashing during `next build`
+// when RESEND_API_KEY is not available (build-time vs runtime secrets).
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return _resend
+}
 
-export { resend }
+export { getResend as resend }
 
 import { siteUrl, siteFromEmail } from "@/lib/site-config"
 
@@ -32,7 +39,7 @@ export async function sendEmailWithRetry(
     try {
       console.log(`📧 Sending email (attempt ${attempt}/${maxRetries}) to:`, emailData.to)
 
-      const result = await resend.emails.send({
+      const result = await getResend().emails.send({
         from: emailData.from || EMAIL_CONFIG.from,
         to: emailData.to,
         subject: emailData.subject,

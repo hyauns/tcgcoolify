@@ -6,16 +6,22 @@ import { verify } from "jsonwebtoken"
 import { neon } from "@neondatabase/serverless"
 import { type OrderEmailData } from "@/lib/email/send-email"
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("[orders/complete] FATAL: JWT_SECRET is not set. Set it in your environment.")
-}
-
-const JWT_SECRET: string = process.env.JWT_SECRET
-
 type SessionPayload = {
   userId: string
   email: string
   role: string
+}
+
+function getOptionalSession(): SessionPayload | null {
+  try {
+    const secret = process.env.JWT_SECRET
+    if (!secret) return null
+    const token = cookies().get("auth-token")?.value
+    if (!token) return null
+    return verify(token, secret) as SessionPayload
+  } catch {
+    return null
+  }
 }
 
 type OrderRow = {
@@ -43,16 +49,6 @@ type OrderRow = {
     unit_price: string | number
     total_price: string | number
   }>
-}
-
-function getOptionalSession(): SessionPayload | null {
-  try {
-    const token = cookies().get("auth-token")?.value
-    if (!token) return null
-    return verify(token, JWT_SECRET) as SessionPayload
-  } catch {
-    return null
-  }
 }
 
 function getSqlConnection() {

@@ -7,16 +7,16 @@ import { checkLoginRateLimit, getClientIP } from "@/lib/rate-limiter"
 import { sign } from "jsonwebtoken"
 import { cookies } from "next/headers"
 
-// JWT_SECRET is validated at startup by lib/env.ts — never fall back to a default.
-// If this throws, it means the server was started without proper env configuration.
-if (!process.env.JWT_SECRET) {
-  throw new Error("[auth/login] FATAL: JWT_SECRET is not set. Set it in your environment.")
-}
-const JWT_SECRET: string = process.env.JWT_SECRET
-
 export async function POST(request: NextRequest) {
   const t0 = performance.now()
   try {
+    // Read JWT_SECRET lazily — never at module scope
+    const JWT_SECRET = process.env.JWT_SECRET
+    if (!JWT_SECRET) {
+      console.error("[auth/login] FATAL: JWT_SECRET is not set.")
+      return NextResponse.json({ error: "Server misconfigured" }, { status: 500 })
+    }
+
     const body = await request.json()
     const { email, password, rememberMe = false } = body
 
@@ -86,7 +86,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Successful login — update login record
-    // Note: Upstash rate limiter auto-resets on successful request
     await updateLastLogin(user.user_id)
     await logLoginAttempt(email, true, clientIP)
 
