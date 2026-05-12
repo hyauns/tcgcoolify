@@ -213,6 +213,9 @@ export function getClientEnv(): ClientEnv {
 // Server env is only validated when running on the server.
 // This prevents client bundles from crashing on missing secrets.
 if (typeof window === "undefined") {
-  getServerEnv()
+  const isBuild = process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build";
+  if (!isBuild) {
+    getServerEnv()
+  }
   getClientEnv()
 }

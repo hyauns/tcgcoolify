@@ -96,9 +96,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const sql = neon(process.env.DATABASE_URL!)
-  const dbCategories = await sql`SELECT name, slug FROM product_categories WHERE is_active = true ORDER BY display_order ASC`
-  const categories = dbCategories.map((c: any) => ({ name: c.name, slug: c.slug }))
+  let categories: { name: string, slug: string }[] = []
+  
+  if (process.env.DATABASE_URL) {
+    try {
+      const sql = neon(process.env.DATABASE_URL)
+      const dbCategories = await sql`SELECT name, slug FROM product_categories WHERE is_active = true ORDER BY display_order ASC`
+      categories = dbCategories.map((c: any) => ({ name: c.name, slug: c.slug }))
+    } catch (e) {
+      console.warn("Failed to fetch categories during layout render:", e)
+    }
+  }
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
