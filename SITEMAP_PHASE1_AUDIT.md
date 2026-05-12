@@ -1,8 +1,0 @@
-# Sitemap Audit Phase 1
-
-1. **Current Sitemap Format**: It uses Next.js `generateSitemaps()` feature (`app/sitemap.ts`), which automatically attempts to output a `sitemapindex`. However, locally it outputs `<urlset>`, and in production `https://www.tcglore.com/sitemap.xml` currently fails and returns a `404 Not Found` (rendering the custom `not-found.tsx` page). This is likely because the server-side generation crashes or times out before finishing.
-2. **URL Count**: The production sitemap is currently unavailable. The code attempts to chunk products in 10,000 increments per child sitemap, which could reach up to ~80,000 product URLs if generation completed successfully.
-3. **Product URL Format**: `app/sitemap.ts` correctly uses `/products/[slug]`. However, it calculates the slug using `name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")` which is slightly different from the canonical `generateSlug()` logic in `lib/products.ts`.
-4. **Broken Old URLs Found**: The core routes still include `/payment` and `/payment-and-orders`. No explicit broken links are listed, but the failure to render the sitemap is a critical issue.
-5. **DB Query Risk**: High. The function `getSitemapProductsBatch` uses `OFFSET` and `LIMIT`. While it only selects `id`, `name`, and `updated_at`, using high offsets (e.g., `OFFSET 70000`) on a large table causes the database to scan and discard rows, leading to high latency and potential timeouts on Vercel/Neon.
-6. **Cache Status**: The sitemap route has `export const revalidate = 86400`, meaning it caches for 24 hours. However, since the initial generation is failing/timing out, the cache is never populated. `robots.ts` correctly points to `${baseUrl}/sitemap.xml`.
