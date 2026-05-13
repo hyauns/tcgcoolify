@@ -282,7 +282,7 @@ export const streamFeedProducts = cache(async function streamFeedProducts(
         SELECT
           p.id,
           p.name,
-          p.description,
+          LEFT(p.description, 5000) AS description,
           p.name AS slug,
           p.price,
           p.original_price,

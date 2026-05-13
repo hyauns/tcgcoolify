@@ -321,14 +321,14 @@ export const getAllProducts = cache(async function getAllProducts(productType?: 
 
       const rows = await sql`
         SELECT
-          p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+          p.id, p.name, p.slug, NULL::text AS description, p.category, p.category_id, p.price, p.original_price, p.image_url,
           p.stock_quantity, p.is_active, p.created_at,
           p.is_pre_order, p.release_date,
           p.rarity, p.brands, p.product_type,
           pc.id   AS pc_id,
           pc.name AS pc_name,
           pc.slug AS pc_slug,
-          pc.description AS pc_description,
+          NULL::text AS pc_description,
           pr.avg_rating,
           pr.review_count
         ${sql.unsafe(PRODUCT_JOIN_SQL)}
@@ -450,14 +450,14 @@ export const getProductsByCategory = cache(async function getProductsByCategory(
 
     const rows = await sql`
       SELECT
-        p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+        p.id, p.name, p.slug, NULL::text AS description, p.category, p.category_id, p.price, p.original_price, p.image_url,
         p.stock_quantity, p.is_active, p.created_at,
         p.is_pre_order, p.release_date,
         p.rarity, p.brands,
         pc.id   AS pc_id,
         pc.name AS pc_name,
         pc.slug AS pc_slug,
-        pc.description AS pc_description,
+        NULL::text AS pc_description,
         pr.avg_rating,
         pr.review_count
       ${sql.unsafe(PRODUCT_JOIN_SQL)}
@@ -543,14 +543,14 @@ export const getProductsByCategorySlug = cache(async function getProductsByCateg
     try {
       const rows = await sql`
         SELECT
-          p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+          p.id, p.name, p.slug, NULL::text AS description, p.category, p.category_id, p.price, p.original_price, p.image_url,
           p.stock_quantity, p.is_active, p.created_at,
           p.is_pre_order, p.release_date,
           p.rarity, p.brands, p.product_type,
           pc.id   AS pc_id,
           pc.name AS pc_name,
           pc.slug AS pc_slug,
-          pc.description AS pc_description,
+          NULL::text AS pc_description,
           pr.avg_rating,
           pr.review_count
         ${sql.unsafe(PRODUCT_JOIN_SQL)}
@@ -844,14 +844,14 @@ export const getFeaturedProducts = cache(async function getFeaturedProducts(): P
       if (rows.length === 0) {
         const anyRows = await sql`
           SELECT
-            p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+            p.id, p.name, p.slug, NULL::text AS description, p.category, p.category_id, p.price, p.original_price, p.image_url,
             p.stock_quantity, p.is_active, p.created_at,
             p.is_pre_order, p.release_date,
             p.rarity,
           pc.id   AS pc_id,
             pc.name AS pc_name,
             pc.slug AS pc_slug,
-            pc.description AS pc_description,
+            NULL::text AS pc_description,
           pr.avg_rating,
           pr.review_count
           ${sql.unsafe(PRODUCT_JOIN_SQL)}
@@ -1075,17 +1075,20 @@ export const getRelatedProducts = cache(async function getRelatedProducts(produc
 
     const rows = await sql`
       SELECT
-        p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+        p.id, p.name, p.slug, NULL::text AS description, p.category, p.category_id, p.price, p.original_price, p.image_url,
         p.stock_quantity, p.is_active, p.created_at,
         p.is_pre_order, p.release_date,
         p.rarity, p.brands,
         pc.id   AS pc_id,
         pc.name AS pc_name,
         pc.slug AS pc_slug,
-        pc.description AS pc_description,
-        pr.avg_rating,
-        pr.review_count
-      ${sql.unsafe(PRODUCT_JOIN_SQL)}
+        NULL::text AS pc_description,
+        NULL::numeric AS avg_rating,
+        NULL::bigint AS review_count
+      FROM products p
+      LEFT JOIN product_categories pc
+             ON (p.category_id IS NOT NULL AND pc.id = p.category_id)
+             OR (p.category_id IS NULL     AND pc.name = p.category AND pc.is_active = true)
       WHERE p.is_active = true
         AND p.id != ${productId}
         AND (
