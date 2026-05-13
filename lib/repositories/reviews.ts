@@ -1,6 +1,6 @@
 import "server-only"
 import { cache } from "react"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "../db-client"
 
 export interface ReviewDb {
   id: string
@@ -13,14 +13,11 @@ export interface ReviewDb {
 }
 
 function getSqlConnection() {
-  const url =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-
-  if (!url) return null
-  return neon(url)
+  try {
+    return getSql()
+  } catch {
+    return null
+  }
 }
 
 export const getReviewsByProductId = cache(async function getReviewsByProductId(productId: number, limit: number = 5): Promise<ReviewDb[]> {

@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "./db-client"
 
 // ============================================================
 // On‑demand revalidation helpers
@@ -46,14 +46,11 @@ export async function revalidateProductPages(slug?: string) {
 // ============================================================
 
 function getSqlConnection() {
-  const url =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-
-  if (!url) return null
-  return neon(url)
+  try {
+    return getSql()
+  } catch {
+    return null
+  }
 }
 
 // ============================================================

@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 import { assertSameOrigin } from "@/lib/csrf"
 
 
 /** GET /api/wishlist — Return all wishlist items for the authenticated user. */
 export async function GET() {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const session = await requireSession()
   if (session instanceof NextResponse) return session
@@ -34,7 +34,7 @@ export async function GET() {
 
 /** POST /api/wishlist — Add a product to the wishlist (idempotent). */
 export async function POST(request: NextRequest) {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const csrfError = assertSameOrigin(request)
   if (csrfError) return csrfError
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
 /** DELETE /api/wishlist — Remove a product from the wishlist. */
 export async function DELETE(request: NextRequest) {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const csrfError = assertSameOrigin(request)
   if (csrfError) return csrfError

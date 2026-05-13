@@ -1,23 +1,7 @@
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "./db-client"
 
-let sql: any = null
+const getSqlConnection = () => getSql()
 
-const getSqlConnection = () => {
-  if (!sql) {
-    const url =
-      process.env.DATABASE_URL ||
-      process.env.POSTGRES_URL ||
-      process.env.DATABASE_URL_UNPOOLED ||
-      process.env.POSTGRES_URL_NON_POOLING
-
-    if (!url) {
-      throw new Error("No database connection string found. Please check your environment variables.")
-    }
-
-    sql = neon(url)
-  }
-  return sql
-}
 
 export interface Customer {
   id: string
@@ -131,7 +115,7 @@ export const adminDb = {
       ORDER BY date DESC
     `
 
-    return result.map((row: { date: string; revenue: string }) => ({
+    return result.map((row: any) => ({
       date: row.date,
       revenue: Number(row.revenue),
     }))
@@ -221,7 +205,7 @@ export const adminDb = {
 
     if (result.length === 0) return null
 
-    const order = result[0]
+    const order: any = result[0]
     return {
       ...order,
       id: String(order.id),
@@ -361,7 +345,7 @@ export const adminDb = {
       ORDER BY o.order_date DESC
     `
 
-    return orders.map((order: { id: { toString: () => string }; customer_id: string; items?: unknown[]; total_amount: string; status: string; order_date: Date; tracking_number?: string }) => ({
+    return orders.map((order: any) => ({
       id: order.id.toString(),
       customer_id: order.customer_id,
       items: order.items || [],

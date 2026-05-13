@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verify } from "jsonwebtoken"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Server misconfigured" }, { status: 500 })
     }
     const JWT_SECRET: string = process.env.JWT_SECRET
-    const sql = neon(process.env.DATABASE_URL!)
+    const sql = getSql()
     const cookieStore = cookies()
     const token = cookieStore.get("auth-token")?.value
 

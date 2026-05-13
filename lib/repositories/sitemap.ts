@@ -1,5 +1,5 @@
 import "server-only"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "../db-client"
 import { profileDbQuery } from "../db-profiler"
 
 export interface SitemapProductRow {
@@ -9,14 +9,11 @@ export interface SitemapProductRow {
 }
 
 function getSqlConnection() {
-  const url =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-
-  if (!url) return null
-  return neon(url)
+  try {
+    return getSql()
+  } catch {
+    return null
+  }
 }
 
 export async function getTotalActiveProductsCount(): Promise<number> {

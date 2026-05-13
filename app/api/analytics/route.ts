@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 
 
@@ -12,7 +12,7 @@ import { requireSession } from "@/lib/auth-guard"
  * Silent endpoint — always returns 200 so the client never retries.
  */
 export async function POST(request: NextRequest) {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const session = await requireSession()
   if (session instanceof NextResponse) return session

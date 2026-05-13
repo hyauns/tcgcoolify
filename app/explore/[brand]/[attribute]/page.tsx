@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { siteUrl } from "@/lib/site-config"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +40,7 @@ function unslugify(slug: string): string {
 // ============================================================
 
 async function getExploreProducts(brandSlug: string, attributeSlug: string, page: number) {
-  const sql = neon(process.env.DATABASE_URL!)
+  const sql = getSql()
   const limit = 24
   const offset = (page - 1) * limit
 

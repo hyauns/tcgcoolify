@@ -1,11 +1,11 @@
 "use server"
 
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { revalidatePath } from "next/cache"
 import { requireAdmin } from "@/lib/auth-guard"
 import { NextResponse } from "next/server"
 
-const sql = neon(process.env.DATABASE_URL!)
+const sql = getSql()
 
 export async function updateAdminProductAction(data: any) {
   try {

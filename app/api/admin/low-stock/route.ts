@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireAdmin } from "@/lib/auth-guard"
 
 /**
@@ -13,7 +13,7 @@ export async function GET() {
   if (admin instanceof NextResponse) return admin
 
   try {
-    const sql = neon(process.env.DATABASE_URL!)
+    const sql = getSql()
 
     const rows = await sql`
       SELECT id, name, stock_quantity

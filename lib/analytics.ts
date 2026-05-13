@@ -1,23 +1,6 @@
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "./db-client"
 
-let sql: any = null
-
-const getSqlConnection = () => {
-  if (!sql) {
-    const url =
-      process.env.DATABASE_URL ||
-      process.env.POSTGRES_URL ||
-      process.env.DATABASE_URL_UNPOOLED ||
-      process.env.POSTGRES_URL_NON_POOLING
-
-    if (!url) {
-      throw new Error("No database connection string found. Please check your environment variables.")
-    }
-
-    sql = neon(url)
-  }
-  return sql
-}
+const getSqlConnection = () => getSql()
 
 export interface RevenueData {
   date: string

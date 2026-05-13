@@ -1,6 +1,6 @@
 import "server-only"
 import { cache } from "react"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "./db-client"
 import type { Review } from "./reviews"
 import { profileDbQuery } from "./db-profiler"
 import { generateRealisticSalesCount } from "./sales-generator"
@@ -86,28 +86,15 @@ interface DbProductJoined extends DbProductRaw {
 // Database connection helper
 // ============================================================
 
-// ============================================================
-// Database connection helper
-// ============================================================
-
 function getSqlConnection() {
-  const url =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-
-  if (!url) {
-    // Guard: this log should only ever appear server-side.
-    // The 'server-only' import above prevents client bundling,
-    // but we double-guard here for defence in depth.
+  try {
+    return getSql()
+  } catch {
     if (typeof window === "undefined" && process.env.NODE_ENV !== "production") {
       console.error("[products] No database connection string found")
     }
     return null
   }
-
-  return neon(url)
 }
 
 // ============================================================

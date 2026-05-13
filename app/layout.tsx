@@ -9,7 +9,7 @@ import { Inter } from "next/font/google"
 import { AnalyticsWrapper } from "@/app/components/analytics-wrapper"
 import { siteUrl } from "@/lib/site-config"
 import { getSiteSettings } from "@/lib/site-settings"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -100,9 +100,7 @@ export default async function RootLayout({
   
   if (process.env.DATABASE_URL) {
     try {
-      const sql = neon(process.env.DATABASE_URL, {
-        fetchOptions: { signal: AbortSignal.timeout(3000) },
-      })
+      const sql = getSql()
       const dbCategories = await sql`SELECT name, slug FROM product_categories WHERE is_active = true ORDER BY display_order ASC`
       categories = dbCategories.map((c: any) => ({ name: c.name, slug: c.slug }))
     } catch (e) {

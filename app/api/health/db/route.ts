@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -8,18 +8,14 @@ export async function GET() {
   const start = Date.now()
 
   try {
-    const url = process.env.DATABASE_URL
-    if (!url) {
+    if (!process.env.DATABASE_URL) {
       return NextResponse.json(
         { ok: false, db: "error", error: "database_not_configured", latencyMs: 0 },
         { status: 503 }
       )
     }
 
-    const sql = neon(url, {
-      fetchOptions: { signal: AbortSignal.timeout(5000) },
-    })
-
+    const sql = getSql()
     await sql`SELECT 1`
 
     const latencyMs = Date.now() - start

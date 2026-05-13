@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { ProductsDataTable } from "./page-client"
 import { Metadata } from "next"
 
@@ -11,7 +11,7 @@ export default async function AdminProductsPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const sql = neon(process.env.DATABASE_URL!)
+  const sql = getSql()
 
   // Parse pagination
   const page = typeof searchParams.page === "string" ? parseInt(searchParams.page, 10) : 1

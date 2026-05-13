@@ -1,20 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireAdmin } from "@/lib/auth-guard"
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-
-function getSql() {
-  const url =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-  if (!url) throw new Error("No DATABASE_URL configured")
-  return neon(url)
-}
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await requireAdmin()

@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 import { assertSameOrigin } from "@/lib/csrf"
 import { checkCartRateLimit, getClientIP } from "@/lib/rate-limiter"
 
 
 function getSqlConnection() {
-  return neon(process.env.DATABASE_URL!)
+  return getSql()
 }
 
 /**

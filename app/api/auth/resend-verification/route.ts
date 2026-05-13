@@ -4,11 +4,11 @@ import { type NextRequest, NextResponse } from "next/server"
 import { findUserByEmail } from "@/lib/auth-database"
 import { generateVerificationToken } from "@/lib/token-utils"
 import { sendVerificationEmail } from "@/lib/email/send-email"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 
 
 export async function POST(request: NextRequest) {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   try {
     const body = await request.json()

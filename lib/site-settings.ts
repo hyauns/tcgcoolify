@@ -1,5 +1,5 @@
 import { cache } from "react"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "./db-client"
 
 export interface SiteSettings {
   heroTitle: string
@@ -43,10 +43,7 @@ const DEFAULTS: SiteSettings = {
 async function fetchSettingsOnce(): Promise<SiteSettings> {
   if (!process.env.DATABASE_URL) return DEFAULTS
 
-  const sql = neon(process.env.DATABASE_URL, {
-    fetchOptions: { signal: AbortSignal.timeout(3000) },
-  })
-
+  const sql = getSql()
   const rows = await sql`SELECT * FROM site_settings WHERE id = 1`
   const row = rows[0]
 

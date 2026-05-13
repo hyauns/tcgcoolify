@@ -1,12 +1,12 @@
 export const dynamic = 'force-dynamic'
 
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 import { assertSameOrigin } from "@/lib/csrf"
 
 function getSqlConnection() {
-  return neon(process.env.DATABASE_URL!)
+  return getSql()
 }
 
 async function getCustomerIdForUser(userId: string): Promise<string | null> {

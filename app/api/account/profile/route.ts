@@ -1,13 +1,13 @@
 export const dynamic = 'force-dynamic'
 
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
+import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 import { assertSameOrigin } from "@/lib/csrf"
 
 
 export async function GET() {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const session = await requireSession()
   if (session instanceof NextResponse) return session
@@ -55,7 +55,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = getSql();
 
   const csrfError = assertSameOrigin(request)
   if (csrfError) return csrfError
