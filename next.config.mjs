@@ -22,6 +22,7 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    minimumCacheTTL: 86400, // 24 hours — reduces re-fetch for optimized images
     remotePatterns: [
       {
         protocol: "https",
