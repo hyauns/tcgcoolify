@@ -41,8 +41,10 @@ export async function profileDbQuery<T>(
     // Fails in contexts without headers (e.g. background tasks or static generation)
   }
 
+  const warning = bytes > 1_000_000 ? " WARNING=large_transfer" : ""
+
   console.log(
-    `[db-profile] path=${path} query=${queryLabel} rows=${rowCount} bytes=${bytes} durationMs=${durationMs} ua="${ua}"`
+    `[db-profile] path=${path} query=${queryLabel} rows=${rowCount} bytes=${bytes} durationMs=${durationMs}${warning}`
   )
 
   return result
