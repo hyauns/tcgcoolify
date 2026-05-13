@@ -301,14 +301,21 @@ export const getPopularProductSlugs = cache(async function getPopularProductSlug
 })
 
 /**
- * Fetch all active products, enriched with category metadata via JOIN.
- * WARNING: Do not call this in generateStaticParams without a limit, as the Neon response may exceed 2MB.
+ * Fetch active products with a hard safety LIMIT.
+ *
+ * WARNING: This function should NOT be called from public routes.
+ * Public pages must use getProductsPage() which provides LIMIT/OFFSET pagination.
+ * The 500-row cap here is a safety net to prevent accidentally fetching 79K+ rows.
  */
+const GETALL_SAFETY_LIMIT = 500
+
 export const getAllProducts = cache(async function getAllProducts(productType?: string | null, rarity?: string | null): Promise<Product[]> {
   return profileDbQuery("getAllProducts", async () => {
     try {
       const sql = getSqlConnection()
       if (!sql) return []
+
+      console.warn(`[products] getAllProducts called — capped at ${GETALL_SAFETY_LIMIT} rows. Use getProductsPage() for public routes.`)
 
       const typeFilter = productType === 'sealed'
         ? sql`AND p.product_type ILIKE '%sealed%'`
@@ -336,7 +343,12 @@ export const getAllProducts = cache(async function getAllProducts(productType?: 
         ${typeFilter}
         ${rarityFilter}
         ${sql.unsafe(PRODUCT_SORT_SQL)}
+        LIMIT ${GETALL_SAFETY_LIMIT}
       ` as DbProductJoined[]
+
+      if (rows.length >= GETALL_SAFETY_LIMIT) {
+        console.warn(`[products] getAllProducts hit safety LIMIT (${GETALL_SAFETY_LIMIT}). Results are truncated.`)
+      }
 
       return rows.map(mapJoinedRowToProduct)
     } catch (error) {
@@ -442,7 +454,11 @@ export const getProductBySlug = cache(async function getProductBySlug(slug: stri
  * Kept for backward-compat; prefer getProductsByCategorySlug for new code.
  */
 export const getProductsByCategory = cache(async function getProductsByCategory(category: string): Promise<Product[]> {
-  if (category === "All Categories" || category === "all") return getAllProducts()
+  if (category === "All Categories" || category === "all") {
+    // Redirect to paginated path instead of fetching all 79K products
+    const result = await getProductsPage({ page: 1, limit: 24 })
+    return result.products
+  }
 
   try {
     const sql = getSqlConnection()
@@ -525,7 +541,11 @@ export const getCategoryBySlug = cache(async function getCategoryBySlug(slug: st
  *      (last resort — no product_categories data at all)
  */
 export const getProductsByCategorySlug = cache(async function getProductsByCategorySlug(slug: string, productType?: string | null, rarity?: string | null): Promise<Product[]> {
-  if (!slug || slug === "all") return getAllProducts(productType, rarity)
+  if (!slug || slug === "all") {
+    // Redirect to paginated path instead of fetching all 79K products
+    const result = await getProductsPage({ page: 1, limit: 24, productType, rarity })
+    return result.products
+  }
 
   return profileDbQuery(`getProductsByCategorySlug(${slug})`, async () => {
     const sql = getSqlConnection()
@@ -1229,14 +1249,19 @@ export function getProductByIdSync(id: number): Product | undefined {
  * Preload the in-memory product cache.
  * Call from Server Components before rendering a Client Component
  * that needs sync product access.
+ *
+ * REQUIRES explicit IDs — will not load all products to prevent 79K-row fetches.
  */
 export async function preloadProductCache(ids?: number[]): Promise<void> {
   if (_productCache) return
 
-  const products = ids
-    ? await Promise.all(ids.map((id) => getProductById(id)))
-    : await getAllProducts()
+  if (!ids || ids.length === 0) {
+    console.warn("[products] preloadProductCache skipped reason=no_ids — call with explicit product IDs to avoid full-catalog fetch")
+    _productCache = new Map()
+    return
+  }
 
+  const products = await Promise.all(ids.map((id) => getProductById(id)))
   const validProducts = products.filter((p): p is Product => p !== undefined)
   _productCache = new Map(validProducts.map((p) => [p.id, p]))
 }
