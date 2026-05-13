@@ -119,7 +119,7 @@ export default function TermsOfService() {
 
               <h3 className="text-xl font-medium text-gray-800 mb-3">5.4 Product Sourcing</h3>
               <p className="text-gray-700 mb-4">
-                We source our products directly from official distributors and authorized suppliers. If you suspect an issue with a product, please contact us for a review and potential replacement or refund.
+                We source our products through U.S.-based supplier and distributor networks. Products are inspected before shipment to confirm packaging condition and order accuracy. If you have a concern about a product, please contact us for a review and potential replacement or refund.
               </p>
             </section>
 
@@ -204,7 +204,7 @@ export default function TermsOfService() {
               <h3 className="text-xl font-medium text-gray-800 mb-3">9.2 Trading Card Copyrights</h3>
               <p className="text-gray-700 mb-4">
                 Trading card games, artwork, and related intellectual property are owned by their respective publishers
-                (e.g., Wizards of the Coast, Konami, Bushiroad). We are authorized retailers of these products.
+                (e.g., Wizards of the Coast, Konami, Bushiroad). TCG Lore is not affiliated with, endorsed by, or officially sponsored by these publishers unless explicitly stated. Brand and publisher names are used solely to identify compatible products.
               </p>
 
               <h3 className="text-xl font-medium text-gray-800 mb-3">9.3 User Content</h3>

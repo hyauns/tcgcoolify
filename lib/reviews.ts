@@ -185,7 +185,7 @@ export function getAllReviews(): Review[] {
       customerName: "Jennifer Adams",
       rating: 4,
       reviewText:
-        "Great prices on sealed products and the authenticity guarantee gives me peace of mind. Highly recommend for serious collectors.",
+        "Great prices on sealed products and the return policy gives me peace of mind. Highly recommend for serious collectors.",
       productName: "Yu-Gi-Oh! - Tournament Pack Sealed Box",
       isVerified: true,
       date: "2023-12-03",

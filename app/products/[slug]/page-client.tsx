@@ -583,9 +583,9 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Verified Sourcing</h3>
+              <h3 className="font-semibold text-lg mb-2">Supplier-Sourced Products</h3>
               <p className="text-gray-600 text-sm">
-                All products are sourced directly from official distributors and verified for authenticity.
+                Products are sourced through U.S.-based supplier and distributor networks and inspected before shipment.
               </p>
             </Card>
 
@@ -619,7 +619,7 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="description">Description</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews ({totalReviewCount.toLocaleString()})</TabsTrigger>
-                <TabsTrigger value="authenticity">Authenticity</TabsTrigger>
+                <TabsTrigger value="authenticity">Product Info</TabsTrigger>
               </TabsList>
 
               <TabsContent value="description" className="p-6">
@@ -792,28 +792,28 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Shield className="w-10 h-10 text-green-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-green-800 mb-2">Verified Sourcing</h3>
-                    <p className="text-gray-600">Every product is verified for authenticity before shipping</p>
+                    <h3 className="text-2xl font-bold text-green-800 mb-2">Product Sourcing</h3>
+                    <p className="text-gray-600">Products are inspected before shipment to confirm packaging condition and order accuracy</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <Award className="w-6 h-6 text-blue-600" />
-                        <h4 className="font-semibold">Official Distributor</h4>
+                        <h4 className="font-semibold">Supplier-Sourced</h4>
                       </div>
                       <p className="text-sm text-gray-600">
-                        We source all products directly from official distributors and authorized retailers.
+                        Products are sourced through U.S.-based supplier and distributor networks.
                       </p>
                     </Card>
 
                     <Card className="p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <CheckCircle className="w-6 h-6 text-green-600" />
-                        <h4 className="font-semibold">Quality Verification</h4>
+                        <h4 className="font-semibold">Condition Check</h4>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Each product undergoes thorough inspection to ensure authenticity and quality.
+                        Products are inspected before shipment to confirm packaging condition and order accuracy.
                       </p>
                     </Card>
 
@@ -846,9 +846,9 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                           1
                         </div>
                         <div>
-                          <h5 className="font-medium text-blue-900">Source Verification</h5>
+                          <h5 className="font-medium text-blue-900">Supplier Review</h5>
                           <p className="text-sm text-blue-700">
-                            All products are sourced from authorized distributors with proper documentation.
+                            Products are sourced through U.S.-based supplier and distributor networks.
                           </p>
                         </div>
                       </div>
@@ -952,13 +952,13 @@ export default function ProductPageClient({ product, relatedProducts }: ProductP
                     <div className="flex items-center gap-3">
                       <Shield className="w-8 h-8 text-green-600" />
                       <div>
-                        <h3 className="font-bold text-green-800">Verified Sourcing</h3>
-                        <p className="text-sm text-gray-600">Every product is verified before shipping</p>
+                        <h3 className="font-bold text-green-800">Product Sourcing</h3>
+                        <p className="text-sm text-gray-600">Products are inspected before shipment</p>
                       </div>
                     </div>
                     {[
-                      { icon: <Award className="w-5 h-5 text-blue-600" />, title: "Official Distributor", text: "Sourced directly from official distributors and authorized retailers." },
-                      { icon: <CheckCircle className="w-5 h-5 text-green-600" />, title: "Quality Verification", text: "Each product undergoes thorough inspection to ensure authenticity." },
+                      { icon: <Award className="w-5 h-5 text-blue-600" />, title: "Supplier-Sourced", text: "Sourced through U.S.-based supplier and distributor networks." },
+                      { icon: <CheckCircle className="w-5 h-5 text-green-600" />, title: "Condition Check", text: "Products are inspected to confirm packaging condition and order accuracy." },
                       { icon: <Package className="w-5 h-5 text-purple-600" />, title: "Secure Packaging", text: "Sealed and packaged securely to prevent tampering during transit." },
                       { icon: <RotateCcw className="w-5 h-5 text-orange-600" />, title: "30-Day Returns", text: "Full return policy if product doesn&apos;t meet our authenticity standards." },
                     ].map(({ icon, title, text }) => (

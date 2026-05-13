@@ -31,7 +31,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center">
-              <Badge className="mb-4 bg-blue-600 hover:bg-blue-700">Est. 2019</Badge>
+              <Badge className="mb-4 bg-blue-600 hover:bg-blue-700">Online TCG Store</Badge>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
                 About TCG Lore.
               </h1>
@@ -49,7 +49,7 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                   <Award className="w-4 h-4" />
-                  <span>5+ Years Trading Card Excellence</span>
+                  <span>Trading Card Products</span>
                 </div>
               </div>
             </div>
@@ -119,8 +119,8 @@ export default function AboutPage() {
                       <p className="text-gray-600">
                         Recognizing the need to serve trading card collectors worldwide, we expanded online, bringing
                         our carefully curated selection of authentic TCG products and personal touch to customers across
-                        the globe. Our authentication process and customer service set new industry standards for online
-                        trading card stores.
+                        the globe. We continue to improve product presentation, shipping transparency, and customer
+                        support to serve trading card collectors online.
                       </p>
                     </div>
                   </div>
@@ -148,7 +148,7 @@ export default function AboutPage() {
                       </li>
                       <li className="flex items-center gap-3">
                         <Heart className="w-5 h-5 text-red-300" />
-                        <span>Passionate TCG Expert Team</span>
+                        <span>Dedicated TCG Team</span>
                       </li>
                       <li className="flex items-center gap-3">
                         <Zap className="w-5 h-5 text-yellow-300" />

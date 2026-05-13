@@ -67,7 +67,7 @@ const getStockInfo = (stockQuantity: number) => {
 // ── Customer reviews ─────────────────────────────────────────────────────────
 
 const customerReviews = [
-  { name: "Sarah M.",     rating: 5, text: "Amazing security features! I felt completely safe making my purchase. The authenticity guarantee gave me peace of mind.", verified: true },
+  { name: "Sarah M.",     rating: 5, text: "Amazing security features! I felt completely safe making my purchase. The return policy gave me peace of mind.", verified: true },
   { name: "Mike T.",      rating: 5, text: "Super secure checkout and the cards arrived exactly as described. Very happy with my purchase!", verified: true },
   { name: "Jessica L.",   rating: 5, text: "Love the secure payment process and the return policy is fantastic. Great customer service too!", verified: true },
   { name: "David R.",     rating: 5, text: "Fast shipping, authentic cards, and excellent security. This is my go-to store for TCG products now.", verified: true },
@@ -77,7 +77,7 @@ const customerReviews = [
   { name: "Jason W.",     rating: 5, text: "Ordered a booster box for my son's birthday. Arrived perfectly packaged and he pulled some amazing cards. Thank you!", verified: true },
   { name: "Maria S.",     rating: 5, text: "Customer service went above and beyond when I had a question about my pre-order. Very impressed with their professionalism.", verified: true },
   { name: "Tyler B.",     rating: 5, text: "The website is so easy to navigate and the product descriptions are detailed. Makes shopping for TCG products a breeze!", verified: true },
-  { name: "Rachel H.",    rating: 5, text: "I was skeptical about buying cards online, but the authenticity guarantee convinced me. Every card was 100% genuine!", verified: true },
+  { name: "Rachel H.",    rating: 5, text: "I was skeptical about buying cards online, but the return policy convinced me. Every card was exactly as described!", verified: true },
   { name: "Kevin L.",     rating: 5, text: "Lightning fast shipping! Ordered on Monday, received on Wednesday. Cards were perfectly protected in bubble wrap.", verified: true },
   { name: "Stephanie C.", rating: 5, text: "Love that they offer both new releases and vintage cards. Found some rare cards I&apos;ve been hunting for years!", verified: true },
   { name: "Brandon M.",   rating: 5, text: "The pre-order system is fantastic. Got my Bloomburrow box on release day without any hassle. Will definitely pre-order again!", verified: true },

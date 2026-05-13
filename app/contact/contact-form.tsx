@@ -180,7 +180,7 @@ export default function ContactFormContent() {
         },
         {
           q: "Are your cards authentic?",
-          a: "All our products are sourced directly from official distributors and manufacturers.",
+          a: "TCG Lore sources sealed trading card products through U.S.-based supplier and distributor networks. Products are inspected before shipment to confirm packaging condition and order accuracy.",
         },
       ],
     },
@@ -194,7 +194,7 @@ export default function ContactFormContent() {
         },
         {
           q: "When will my card be charged?",
-          a: "Your card is charged immediately upon order placement. For pre-orders, payment is processed at the time of order, not at shipping.",
+          a: "Your card is authorized at checkout. The final charge is captured when your order is prepared for shipment. For pre-orders, payment is captured when the item becomes available.",
         },
         {
           q: "Is my payment information secure?",
