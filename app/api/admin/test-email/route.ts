@@ -51,6 +51,7 @@ export async function POST(request: Request) {
         message: "Test email sent successfully", 
         id: result.messageId,
         from: EMAIL_CONFIG.from,
+        replyTo: EMAIL_CONFIG.replyTo,
         to: recipient
       })
     } else {
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
         ok: false, 
         error: result.error,
         from: EMAIL_CONFIG.from,
+        replyTo: EMAIL_CONFIG.replyTo,
         to: recipient 
       }, { status: 500 })
     }

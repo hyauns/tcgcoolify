@@ -39,6 +39,10 @@ const serverSchema = z.object({
     .string()
     .default("TCG Lore Operated by TCG Lore. <orders@email.tcglore.com>"),
 
+  EMAIL_REPLY_TO: z
+    .string()
+    .default("cs@tcglore.com"),
+
   ADMIN_EMAIL: z
     .string()
     .email("ADMIN_EMAIL must be a valid email address")

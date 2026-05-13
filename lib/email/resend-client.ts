@@ -17,6 +17,7 @@ import { siteUrl, siteFromEmail } from "@/lib/site-config"
 // Configuration constants
 export const EMAIL_CONFIG = {
   from: siteFromEmail,
+  replyTo: process.env.EMAIL_REPLY_TO || "cs@tcglore.com",
   adminEmail: process.env.ADMIN_EMAIL || "orders@email.tcglore.com",
   baseUrl: siteUrl,
   testMode: process.env.NODE_ENV === "development",
@@ -37,12 +38,14 @@ export async function sendEmailWithRetry(
     html: string
     text?: string
     from?: string
+    replyTo?: string
   },
   maxRetries = 3,
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   let lastError: any = null
   
   const fromAddress = emailData.from || EMAIL_CONFIG.from;
+  const replyToAddress = emailData.replyTo || EMAIL_CONFIG.replyTo;
   const toDomain = extractDomain(emailData.to);
   // Simple heuristic for type based on subject
   const emailType = emailData.subject.toLowerCase().includes('order') ? 'order_confirmation' : 
@@ -52,7 +55,7 @@ export async function sendEmailWithRetry(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`[email] send_start type=${emailType} from=${fromAddress} toDomain=${toDomain} subject="${emailData.subject}" attempt=${attempt}`)
+      console.log(`[email] send_start type=${emailType} from=${fromAddress} replyTo=${replyToAddress} toDomain=${toDomain} subject="${emailData.subject}" attempt=${attempt}`)
 
       const result = await getResend().emails.send({
         from: fromAddress,
@@ -60,6 +63,7 @@ export async function sendEmailWithRetry(
         subject: emailData.subject,
         html: emailData.html,
         text: emailData.text,
+        replyTo: replyToAddress,
       })
 
       if (result.data?.id) {
