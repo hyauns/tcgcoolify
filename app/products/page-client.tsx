@@ -32,6 +32,7 @@ import { Footer } from "../components/footer"
 import { useCart } from "@/lib/cart-context"
 import { QuickViewModal, type ProductDetails } from "../components/quick-view-modal"
 import { useWishlist } from "@/lib/wishlist-context"
+import { useToast } from "@/hooks/use-toast"
 import { useProductFilters } from "@/hooks/useProductFilters"
 import { PRICE_RANGES, SORT_OPTIONS } from "@/lib/product-filters"
 import { generateSlug } from "@/lib/utils"
@@ -61,6 +62,7 @@ function ProductsContent({ dataPromise, activeCategorySlug, activeSearch }: Prod
 
   const { dispatch, addItemWithAnimation, isAddingToCart, recentlyAddedItem } = useCart()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
+  const { toast } = useToast()
   const searchParams = useSearchParams()
 
   const {
@@ -102,11 +104,22 @@ function ProductsContent({ dataPromise, activeCategorySlug, activeSearch }: Prod
       })
 
       setButtonStates((prev) => ({ ...prev, [productId]: "success" }))
+      toast({
+        title: product.isPreOrder ? "Pre-Order Added!" : "Added to Cart!",
+        description: `${product.name} has been ${product.isPreOrder ? "pre-ordered" : "added to your cart"}.`,
+        duration: 3000,
+      })
       setTimeout(() => {
         setButtonStates((prev) => ({ ...prev, [productId]: "idle" }))
       }, 2000)
     } catch (error) {
       setButtonStates((prev) => ({ ...prev, [productId]: "idle" }))
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      })
     }
   }
 
