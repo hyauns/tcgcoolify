@@ -3,6 +3,7 @@ import { cache } from "react"
 import { getSql } from "./db-client"
 import type { Review } from "./reviews"
 import { profileDbQuery } from "./db-profiler"
+import { withDbRetry } from "./db-retry"
 import { generateRealisticSalesCount } from "./sales-generator"
 
 // ============================================================
@@ -393,37 +394,46 @@ export const getProductById = cache(async function getProductById(id: number): P
  */
 export const getProductBySlug = cache(async function getProductBySlug(slug: string): Promise<Product | undefined> {
   return profileDbQuery(`getProductBySlug(${slug})`, async () => {
-    try {
-      const sql = getSqlConnection()
-      if (!sql) return undefined
+    const sql = getSqlConnection()
+    if (!sql) return undefined
 
-      // Replicate generateSlug() in SQL:
-      //   Use the DB `slug` column directly for indexed single-row lookup.
-      const rows = await sql`
-        SELECT
-          p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
-          p.stock_quantity, p.is_active, p.created_at,
-          p.is_pre_order, p.release_date,
-          p.rarity, p.brands,
-          pc.id   AS pc_id,
-          pc.name AS pc_name,
-          pc.slug AS pc_slug,
-          pc.description AS pc_description,
-          pr.avg_rating,
-          pr.review_count
-        ${sql.unsafe(PRODUCT_JOIN_SQL)}
-        WHERE p.is_active = true
-          AND p.slug = ${slug}
-        LIMIT 1
-      ` as DbProductJoined[]
+    const result = await withDbRetry(
+      { label: `getProductBySlug(${slug})`, maxRetries: 2, timeoutMs: 8000 },
+      async () => {
+        return await sql`
+          SELECT
+            p.id, p.name, p.slug, p.description, p.category, p.category_id, p.price, p.original_price, p.image_url,
+            p.stock_quantity, p.is_active, p.created_at,
+            p.is_pre_order, p.release_date,
+            p.rarity, p.brands,
+            pc.id   AS pc_id,
+            pc.name AS pc_name,
+            pc.slug AS pc_slug,
+            pc.description AS pc_description,
+            pr.avg_rating,
+            pr.review_count
+          ${sql.unsafe(PRODUCT_JOIN_SQL)}
+          WHERE p.is_active = true
+            AND p.slug = ${slug}
+          LIMIT 1
+        ` as DbProductJoined[]
+      },
+    )
 
-      if (!rows[0]) return undefined
+    if (!result.ok) {
+      // DB error — throw so page shows error boundary / 500, NOT 404
+      console.error(`[products] DB error for slug="${slug}" (${result.attempts} attempts, ${result.durationMs}ms): ${result.error.message}`)
+      throw result.error
+    }
 
-      return mapJoinedRowToProduct(rows[0])
-    } catch (error) {
-      console.error("[products] Error fetching product by slug:", (error as Error).message)
+    const rows = result.data
+    if (!rows[0]) {
+      console.log(`[products] product_lookup_not_found slug="${slug}" (${result.durationMs}ms)`)
       return undefined
     }
+
+    console.log(`[products] product_lookup_success slug="${slug}" id=${rows[0].id} (${result.durationMs}ms)`)
+    return mapJoinedRowToProduct(rows[0])
   })
 })
 

@@ -19,7 +19,13 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const product = await getProductBySlug(params.slug)
+  let product: Awaited<ReturnType<typeof getProductBySlug>>
+  try {
+    product = await getProductBySlug(params.slug)
+  } catch {
+    // DB error during metadata — return safe fallback
+    return { title: "TCG Lore | Premium Trading Cards" }
+  }
   
   if (!product) {
     return {
@@ -82,7 +88,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  const product = await getProductBySlug(params.slug)
+  let product: Awaited<ReturnType<typeof getProductBySlug>>
+
+  try {
+    product = await getProductBySlug(params.slug)
+  } catch (error) {
+    // DB error — let Next.js error boundary handle this as 500,
+    // NOT notFound() which would send 404 to Google/users
+    console.error(`[PDP] DB error for slug="${params.slug}", showing error boundary:`, (error as Error).message)
+    throw error
+  }
   
   if (!product) {
     notFound()
