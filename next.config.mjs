@@ -40,6 +40,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "cdn.beautypremier.store",
       },
+      {
+        protocol: "https",
+        hostname: "pub-383b4a6cc335493b948a15793ecbf997.r2.dev",
+      },
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],

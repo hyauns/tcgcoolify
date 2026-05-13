@@ -7,6 +7,7 @@ import Image, { ImageProps } from "next/image"
 // These are CDNs we control or that are fast/reliable enough for server-side fetch.
 const OPTIMIZABLE_HOSTS = new Set([
   "cdn.beautypremier.store",
+  "pub-383b4a6cc335493b948a15793ecbf997.r2.dev",
 ])
 
 /**

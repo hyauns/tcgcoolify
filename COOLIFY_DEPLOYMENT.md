@@ -105,8 +105,10 @@ Vercel Blob was replaced for new uploads. New image uploads go to Cloudflare R2 
 
 *Note: Old Vercel Blob URLs are still kept accessible in the database and Next.js config until older images are manually migrated or replaced.*
 
-### Public CDN Base URL
-`https://cdn.beautypremier.store`
+### Public R2 Base URL (temporary)
+`https://pub-383b4a6cc335493b948a15793ecbf997.r2.dev`
+
+> **Note:** This is a temporary R2 public development URL. When `cdn.beautypremier.store` is pointed to the correct R2 bucket, switch `R2_PUBLIC_BASE_URL` back to `https://cdn.beautypremier.store`.
 
 ### Required Coolify Env Vars
 ```env
@@ -114,7 +116,7 @@ R2_ACCOUNT_ID=your_cloudflare_account_id
 R2_ACCESS_KEY_ID=your_r2_access_key
 R2_SECRET_ACCESS_KEY=your_r2_secret_key
 R2_BUCKET_NAME=your_bucket_name
-R2_PUBLIC_BASE_URL=https://cdn.beautypremier.store
+R2_PUBLIC_BASE_URL=https://pub-383b4a6cc335493b948a15793ecbf997.r2.dev
 ```
 *(Do not include a trailing slash in `R2_PUBLIC_BASE_URL`)*
 
