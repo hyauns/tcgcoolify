@@ -19,8 +19,15 @@ COPY . .
 # Next.js telemetry is disabled during the build
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Coolify passes SOURCE_COMMIT automatically; also accept COMMIT_SHA for manual builds
+ARG COMMIT_SHA=unknown
+ENV COMMIT_SHA=${COMMIT_SHA}
+
 # Build the application
-RUN npm run build
+RUN BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+    && echo "COMMIT_SHA=${COMMIT_SHA}" \
+    && echo "BUILD_TIME=${BUILD_TIME}" \
+    && COMMIT_SHA=${COMMIT_SHA} BUILD_TIME=${BUILD_TIME} npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -30,6 +37,12 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+
+# Version tracking — inherited from builder ARG
+ARG COMMIT_SHA=unknown
+ENV COMMIT_SHA=${COMMIT_SHA}
+ARG BUILD_TIME=unknown
+ENV BUILD_TIME=${BUILD_TIME}
 
 # sharp requires libc6-compat on Alpine for native image processing
 RUN apk add --no-cache libc6-compat
