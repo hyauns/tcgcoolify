@@ -137,81 +137,49 @@ export async function POST(request: NextRequest) {
 
       for (const item of items) {
         const requestedQuantity = Number(item.quantity)
-        let stockQuantity = 0
-        let isPreOrder = false
-        let stockResolved = false
 
-        // Try inventory table first (with row lock)
-        try {
-          const invRows = await sql`
-            SELECT i.stock_on_hand, p.is_pre_order, p.price
-            FROM products p
-            LEFT JOIN inventory i ON i.product_id = p.id
-            WHERE p.id = ${String(item.id)}
-            FOR UPDATE OF p
-          `
-          if (invRows.length === 0) {
-            throw new Error(`PRODUCT_NOT_FOUND:${item.name}`)
-          }
-          stockQuantity = Number(invRows[0].stock_on_hand) || 0
-          isPreOrder = Boolean(invRows[0].is_pre_order)
-          item.price = Number(invRows[0].price) || 0
-          stockResolved = true
-        } catch (invError: any) {
-          // If PRODUCT_NOT_FOUND, re-throw immediately
-          if (invError?.message?.startsWith("PRODUCT_NOT_FOUND:")) throw invError
-
-          console.warn(`[orders/create] inventory table not found - trying products.stock_quantity for "${item.name}"`)
-
-          // Fallback: try products.stock_quantity
-          try {
-            const legacyRows = await sql`
-              SELECT stock_quantity, is_pre_order, price FROM products WHERE id = ${String(item.id)} FOR UPDATE
-            `
-            if (legacyRows.length === 0) {
-              throw new Error(`PRODUCT_NOT_FOUND:${item.name}`)
-            }
-            stockQuantity = Number(legacyRows[0].stock_quantity) || 0
-            isPreOrder = Boolean(legacyRows[0].is_pre_order)
-            item.price = Number(legacyRows[0].price) || 0
-            stockResolved = true
-          } catch (legacyError: any) {
-            if (legacyError?.message?.startsWith("PRODUCT_NOT_FOUND:")) throw legacyError
-
-            // Final fallback: just check product exists
-            const existsRows = await sql`SELECT id, is_pre_order, price FROM products WHERE id = ${String(item.id)}`
-            if (existsRows.length === 0) {
-              throw new Error(`PRODUCT_NOT_FOUND:${item.name}`)
-            }
-            item.price = Number(existsRows[0].price) || 0
-            throw new Error(`INVENTORY_UNAVAILABLE:${item.name}`)
-          }
+        // Lock the product row and read stock + price
+        const productRows = await sql`
+          SELECT id, stock_quantity, is_pre_order, price
+          FROM products
+          WHERE id = ${String(item.id)}
+          FOR UPDATE
+        `
+        if (productRows.length === 0) {
+          throw new Error(`PRODUCT_NOT_FOUND:${item.name}`)
         }
 
+        const product = productRows[0]
+        const stockQuantity = Number(product.stock_quantity) || 0
+        const isPreOrder = Boolean(product.is_pre_order)
+        item.price = Number(product.price) || 0
+
+        // Pre-order products skip stock check
         if (!isPreOrder && stockQuantity < requestedQuantity) {
           throw new Error(`INSUFFICIENT_STOCK:${item.name}`)
         }
 
-        if (stockResolved) {
-          // Try deducting from inventory table first
-          try {
-            await sql`
-              UPDATE inventory
-              SET stock_on_hand = GREATEST(0, stock_on_hand - ${requestedQuantity})
-              WHERE product_id = ${String(item.id)}
-            `
-          } catch {
-            // Fallback: deduct from products.stock_quantity
-            try {
-              await sql`
-                UPDATE products
-                SET stock_quantity = GREATEST(0, stock_quantity - ${requestedQuantity})
-                WHERE id = ${String(item.id)}
-              `
-            } catch {
-              throw new Error(`INVENTORY_WRITE_UNAVAILABLE:${item.name}`)
-            }
-          }
+        // Atomic stock deduction — prevents overselling via WHERE guard
+        const updateResult = await sql`
+          UPDATE products
+          SET stock_quantity = stock_quantity - ${requestedQuantity}
+          WHERE id = ${String(item.id)}
+            AND stock_quantity >= ${requestedQuantity}
+          RETURNING id, stock_quantity
+        `
+
+        // If no row returned and not pre-order, another checkout took the stock
+        if (updateResult.length === 0 && !isPreOrder) {
+          throw new Error(`INSUFFICIENT_STOCK:${item.name}`)
+        }
+
+        // For pre-order products where stock might be 0, allow negative
+        if (updateResult.length === 0 && isPreOrder) {
+          await sql`
+            UPDATE products
+            SET stock_quantity = GREATEST(0, stock_quantity - ${requestedQuantity})
+            WHERE id = ${String(item.id)}
+          `
         }
 
         serverSubtotal += item.price * requestedQuantity
@@ -428,12 +396,6 @@ export async function POST(request: NextRequest) {
     }
     if (message.startsWith("PRODUCT_NOT_FOUND:")) {
       return NextResponse.json({ error: "Product not found", detail: message.split(":")[1] }, { status: 400 })
-    }
-    if (message.startsWith("INVENTORY_UNAVAILABLE:") || message.startsWith("INVENTORY_WRITE_UNAVAILABLE:")) {
-      return NextResponse.json(
-        { error: "Inventory unavailable", detail: `Inventory validation failed for ${message.split(":")[1]}` },
-        { status: 503 },
-      )
     }
 
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
