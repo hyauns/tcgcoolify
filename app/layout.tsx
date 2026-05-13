@@ -100,11 +100,13 @@ export default async function RootLayout({
   
   if (process.env.DATABASE_URL) {
     try {
-      const sql = neon(process.env.DATABASE_URL)
+      const sql = neon(process.env.DATABASE_URL, {
+        fetchOptions: { signal: AbortSignal.timeout(3000) },
+      })
       const dbCategories = await sql`SELECT name, slug FROM product_categories WHERE is_active = true ORDER BY display_order ASC`
       categories = dbCategories.map((c: any) => ({ name: c.name, slug: c.slug }))
     } catch (e) {
-      console.warn("Failed to fetch categories during layout render:", e)
+      console.warn("[layout] Failed to fetch categories (using empty fallback):", (e as Error).message)
     }
   }
   const orgSchema = {

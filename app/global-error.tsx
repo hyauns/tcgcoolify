@@ -19,6 +19,8 @@ export default function GlobalError({
           isGlobalError: true,
         },
       })
+    }).catch(() => {
+      // Sentry not available — skip reporting
     })
   }, [error])
 

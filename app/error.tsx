@@ -18,6 +18,8 @@ export default function Error({
           digest: error.digest,
         },
       })
+    }).catch(() => {
+      // Sentry not available — skip reporting
     })
   }, [error])
 
