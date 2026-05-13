@@ -1,4 +1,13 @@
-import { headers } from "next/headers"
+/**
+ * Lightweight DB query profiler.
+ *
+ * Enable by setting PROFILE_DB_TRANSFER=true in environment.
+ *
+ * IMPORTANT: This module must NOT import next/headers or any other
+ * Next.js dynamic API.  Doing so would force every page that
+ * transitively calls profileDbQuery() to become fully dynamic,
+ * breaking static/ISR generation for product detail pages.
+ */
 
 export async function profileDbQuery<T>(
   queryLabel: string,
@@ -30,21 +39,10 @@ export async function profileDbQuery<T>(
     bytes = -1
   }
 
-  let ua = "unknown"
-  let path = "unknown"
-  try {
-    // Await headers() for Next.js 15+ compatibility, works in 14 too
-    const h = headers()
-    ua = h.get("user-agent") || "unknown"
-    path = h.get("x-invoke-path") || h.get("referer") || "unknown"
-  } catch (e) {
-    // Fails in contexts without headers (e.g. background tasks or static generation)
-  }
-
   const warning = bytes > 1_000_000 ? " WARNING=large_transfer" : ""
 
   console.log(
-    `[db-profile] path=${path} query=${queryLabel} rows=${rowCount} bytes=${bytes} durationMs=${durationMs}${warning}`
+    `[db-profile] query=${queryLabel} rows=${rowCount} bytes=${bytes} durationMs=${durationMs}${warning}`
   )
 
   return result
