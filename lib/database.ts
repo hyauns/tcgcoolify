@@ -152,25 +152,29 @@ export const adminDb = {
     const statusParam = status || null;
     const offset = (page - 1) * limit;
 
+    // orders.customer_id stores customers.id (integer-as-string) per
+    // app/api/orders/create/route.ts (resolveCustomerId / resolveGuestCustomerId
+    // both INSERT into the customers table and write that id back). Joining
+    // users would never match — the JOIN below targets customers.
     const countResult = await connection`
-      SELECT COUNT(*) as total 
+      SELECT COUNT(*) as total
       FROM orders o
-      LEFT JOIN users u ON o.customer_id::text = u.user_id::text
-      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR u.email ILIKE ${searchParam} OR u.first_name ILIKE ${searchParam} OR u.last_name ILIKE ${searchParam})
+      LEFT JOIN customers c ON c.id::text = o.customer_id::text
+      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam})
         AND (${statusParam}::text IS NULL OR o.status = ${statusParam})
     `;
     const total = Number(countResult[0]?.total || 0);
 
     const orders = await connection`
-      SELECT 
+      SELECT
         o.*,
-        u.first_name || ' ' || COALESCE(u.last_name, '') as customer_name,
-        u.email as customer_email
+        c.first_name || ' ' || COALESCE(c.last_name, '') as customer_name,
+        c.email as customer_email
       FROM orders o
-      LEFT JOIN users u ON o.customer_id::text = u.user_id::text
-      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR u.email ILIKE ${searchParam} OR u.first_name ILIKE ${searchParam} OR u.last_name ILIKE ${searchParam})
+      LEFT JOIN customers c ON c.id::text = o.customer_id::text
+      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam})
         AND (${statusParam}::text IS NULL OR o.status = ${statusParam})
-      ORDER BY o.created_at DESC 
+      ORDER BY o.created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `;
 
@@ -192,26 +196,47 @@ export const adminDb = {
   async getOrderById(id: string): Promise<Order | null> {
     const connection = getSqlConnection()
 
+    // See getOrders above — orders.customer_id targets customers.id, not users.user_id.
     const result = await connection`
-      SELECT 
+      SELECT
         o.*,
-        u.first_name || ' ' || COALESCE(u.last_name, '') as customer_name,
-        u.email as customer_email,
-        u.user_id as customer_user_id
+        c.first_name || ' ' || COALESCE(c.last_name, '') as customer_name,
+        c.email as customer_email,
+        c.id as customer_table_id
       FROM orders o
-      LEFT JOIN users u ON o.customer_id::text = u.user_id::text
+      LEFT JOIN customers c ON c.id::text = o.customer_id::text
       WHERE o.id = ${id}
     `
 
     if (result.length === 0) return null
 
     const order: any = result[0]
+
+    // Fetch order_items separately so the admin details modal can render line
+    // items. Frontend (app/admin/orders/page.tsx) expects each item to expose
+    // { name, quantity, price }.
+    const itemRows = await connection`
+      SELECT id, product_id, product_name, quantity, unit_price, total_price
+      FROM order_items
+      WHERE order_id = ${Number(order.id)}
+      ORDER BY id ASC
+    `
+    const items = itemRows.map((row: any) => ({
+      id: String(row.id),
+      product_id: String(row.product_id),
+      name: row.product_name,
+      price: Number(row.unit_price),
+      quantity: Number(row.quantity),
+      total_price: Number(row.total_price),
+    }))
+
     return {
       ...order,
       id: String(order.id),
       total: Number(order.total_amount),
+      items,
       customer: {
-        id: String(order.customer_user_id ?? order.customer_id),
+        id: String(order.customer_table_id ?? order.customer_id),
         name: order.customer_name?.trim() || "Guest",
         email: order.customer_email || "No Email",
       },

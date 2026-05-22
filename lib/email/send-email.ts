@@ -8,6 +8,7 @@ import { EmailVerificationTemplate, getEmailVerificationText } from "./templates
 import { PasswordResetTemplate, getPasswordResetText } from "./templates/password-reset"
 import { PasswordChangedTemplate, getPasswordChangedText } from "./templates/password-changed"
 import { AdminOrderNotificationTemplate, getAdminOrderNotificationText } from "./templates/admin-order-notification"
+import { OrderCancellationTemplate, getOrderCancellationText } from "./templates/order-cancellation"
 
 // Types
 export interface OrderEmailData {
@@ -102,6 +103,45 @@ export async function sendOrderConfirmation(
     return result
   } catch (error) {
     console.error("[v0] sendOrderConfirmation: failed:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
+}
+
+export async function sendOrderCancellation(
+  params: {
+    customerEmail: string
+    customerName: string
+    orderNumber: string
+    cancelledAt?: Date
+  },
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  console.log("[v0] sendOrderCancellation: attempting to send to:", params.customerEmail)
+  console.log("[v0] sendOrderCancellation: orderNumber:", params.orderNumber)
+  try {
+    const cancelledAt = params.cancelledAt ?? new Date()
+    const html = await render(
+      OrderCancellationTemplate({
+        orderNumber: params.orderNumber,
+        customerName: params.customerName,
+        cancelledAt,
+      }),
+    )
+    const text = getOrderCancellationText({
+      orderNumber: params.orderNumber,
+      customerName: params.customerName,
+      cancelledAt,
+    })
+
+    const result = await sendEmailWithRetry({
+      to: params.customerEmail,
+      subject: `Your TCG Lore order has been cancelled - ${params.orderNumber}`,
+      html,
+      text,
+    })
+    console.log("[v0] sendOrderCancellation: Resend result:", result)
+    return result
+  } catch (error) {
+    console.error("[v0] sendOrderCancellation: failed:", error)
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }

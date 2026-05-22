@@ -5,6 +5,7 @@ import { adminDb } from "@/lib/database"
 import { revalidateProductPages } from "@/lib/admin-actions"
 import { requireAdmin } from "@/lib/auth-guard"
 import { decryptPhone } from "@/lib/payment-security"
+import { sendOrderCancellation } from "@/lib/email/send-email"
 
 /**
  * Safely attempt to decrypt a phone number from an encrypted JSONB field.
@@ -64,11 +65,55 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   try {
     const { status, tracking } = await request.json()
+
+    // Snapshot the previous order so the cancellation email guard can compare
+    // statuses without an extra fetch after the UPDATE. getOrderById returns
+    // customer.email (or "No Email" fallback) and the current status string.
+    const prevOrder = await adminDb.getOrderById(params.id)
+
     await adminDb.updateOrderStatus(params.id, status, tracking)
 
     // Revalidate product pages — order status changes (e.g. cancellation)
     // may affect stock levels displayed on the storefront.
     await revalidateProductPages()
+
+    // Cancellation email: only fire on the transition non-cancelled → CANCELLED
+    // and only if we actually have a deliverable customer email. Fire-and-forget
+    // to match the gateway-webhook email pattern; a send failure does not
+    // roll back the status update.
+    if (
+      status === "CANCELLED" &&
+      prevOrder &&
+      prevOrder.status !== "CANCELLED"
+    ) {
+      const email = prevOrder.customer?.email
+      const hasRealEmail = !!email && email !== "No Email" && email.includes("@")
+      if (!hasRealEmail) {
+        console.warn(
+          `[admin-orders] Cancellation email skipped — order ${params.id} has no customer email`,
+        )
+      } else {
+        const orderNumber =
+          (prevOrder as { order_number?: string }).order_number ||
+          `#${String(prevOrder.id).slice(-8)}`
+        const customerName = prevOrder.customer?.name || "Customer"
+        ;(async () => {
+          try {
+            await sendOrderCancellation({
+              customerEmail: email,
+              customerName,
+              orderNumber,
+              cancelledAt: new Date(),
+            })
+          } catch (emailError) {
+            console.error(
+              "[admin-orders] Cancellation email send threw:",
+              emailError,
+            )
+          }
+        })()
+      }
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
