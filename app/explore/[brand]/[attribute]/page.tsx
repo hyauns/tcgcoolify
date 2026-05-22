@@ -8,9 +8,16 @@ import { Badge } from "@/components/ui/badge"
 import { Star, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ImageWithFallback } from "@/components/ui/image-with-fallback"
-import { Suspense, use } from "react"
+import { Suspense, use, cache } from "react"
 import { ProductGridSkeleton } from "@/components/ui/product-skeleton"
 import { Skeleton } from "@/components/ui/skeleton"
+
+// Page-level ISR. Triple-ILIKE full-table scan is expensive (see
+// _audit/04-performance.md P0-5); cache the rendered HTML for an hour.
+//   NOTE: the underlying SQL is still ILIKE '%...%' across brands+rarity+
+//   product_type. A DB trigram or normalized brand/attribute table would
+//   give the bigger win — deferred to a future phase.
+export const revalidate = 3600
 
 // ============================================================
 // Types
@@ -39,7 +46,10 @@ function unslugify(slug: string): string {
 // Database Query (Server-side)
 // ============================================================
 
-async function getExploreProducts(brandSlug: string, attributeSlug: string, page: number) {
+// React `cache()` dedupes the call inside a single request, so
+// `generateMetadata` and the page render share one DB round-trip instead of
+// two. Args must stay primitive (string + number) for the memo key to work.
+const getExploreProducts = cache(async function getExploreProductsImpl(brandSlug: string, attributeSlug: string, page: number) {
   const sql = getSql()
   const limit = 24
   const offset = (page - 1) * limit
@@ -103,7 +113,7 @@ async function getExploreProducts(brandSlug: string, attributeSlug: string, page
     console.error("[Explore] Database error:", error)
     return { products: [], totalCount: 0 }
   }
-}
+})
 
 // ============================================================
 // SEO Metadata (Programmatic SEO)
@@ -194,7 +204,7 @@ async function ExploreProductList({ dataPromise, brandName, attributeName, page,
               <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 relative flex flex-col h-full">
                 <CardHeader className="p-0 flex-shrink-0">
                   <div className="relative overflow-hidden rounded-t-lg">
-                    <Link href={`/product/${product.slug}`}>
+                    <Link href={`/products/${product.slug}`}>
                       <div className="bg-slate-50 border-b flex items-center justify-center p-6 overflow-hidden w-full aspect-square rounded-t-lg">
                         <ImageWithFallback
                           src={product.image || "/placeholder.png"}
@@ -224,7 +234,7 @@ async function ExploreProductList({ dataPromise, brandName, attributeName, page,
                       {product.category}
                     </span>
                   </div>
-                  <Link href={`/product/${product.slug}`} className="flex-grow">
+                  <Link href={`/products/${product.slug}`} className="flex-grow">
                     <CardTitle className="text-lg mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
                       {product.name}
                     </CardTitle>
@@ -243,7 +253,7 @@ async function ExploreProductList({ dataPromise, brandName, attributeName, page,
                   </div>
                   <div className="mt-4 pt-4 border-t w-full">
                     <Button className="w-full" asChild>
-                      <Link href={`/product/${product.slug}`}>
+                      <Link href={`/products/${product.slug}`}>
                         View Details
                       </Link>
                     </Button>

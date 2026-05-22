@@ -19,7 +19,7 @@ export function useProductFilters(
   const isInitializedRef = useRef(false)
 
   const [filters, setFilters] = useState<FilterOptions>(() => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() ?? "")
 
     // Categories: prefer explicit URL param; fall back to server-passed activeCategory
     const urlCategories = params.get("categories")

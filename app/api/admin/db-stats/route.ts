@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getSql } from "@/lib/db-client"
+import { requireAdmin } from "@/lib/auth-guard"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
@@ -7,14 +8,11 @@ export const runtime = "nodejs"
 /**
  * Admin-only diagnostic endpoint for Neon DB stats.
  * Shows table sizes, row counts, and top queries (if pg_stat_statements is available).
- * Authorization: Bearer token via CRON_SECRET env var.
+ * Authorization: session cookie with role=admin (via requireAdmin).
  */
-export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization")
-  const secret = process.env.CRON_SECRET
-  if (!secret || authHeader !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export async function GET(_request: Request) {
+  const admin = await requireAdmin()
+  if (admin instanceof NextResponse) return admin
 
   const sql = getSql()
   const results: Record<string, any> = {}

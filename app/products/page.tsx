@@ -8,8 +8,14 @@ import { getFilterAggregations } from "@/lib/repositories/filters"
 import ProductsPageClient from "./page-client"
 import { siteUrl } from "@/lib/site-config"
 
-// Dynamic rendering — required for searchParams + per-category SEO metadata
-export const dynamic = "force-dynamic"
+// The page reads `searchParams`, so each unique URL renders dynamically per
+// request. Setting `revalidate = 300` lets the data cache (and Next's full-page
+// cache for searchParam combinations that recur) serve repeat traffic without
+// re-hitting Neon. Admin product mutations call revalidatePath("/products")
+// (see app/admin/products/actions.ts:69), so price/stock changes propagate
+// promptly; this interval is just a safety net for upstream data that bypasses
+// the admin UI.
+export const revalidate = 300
 
 // ============================================================
 // Dynamic Metadata (per-category SEO)

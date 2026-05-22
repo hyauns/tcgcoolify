@@ -5,6 +5,7 @@ import type { Review } from "./reviews"
 import { profileDbQuery } from "./db-profiler"
 import { withDbRetry } from "./db-retry"
 import { generateRealisticSalesCount } from "./sales-generator"
+import { normalizePreorderFlag } from "./preorder"
 
 // ============================================================
 // Public types — matching the Product interface expected by pages
@@ -217,7 +218,8 @@ function mapJoinedRowToProduct(row: DbProductJoined): Product {
   // ─── Pre-order & release date ────────────────────────────────────────────
   // Read is_pre_order from DB when available (will be null if column is missing —
   // the try/catch in getPreOrderProducts guards that case at query time).
-  let isPreOrder = Boolean(row.is_pre_order)
+  // Use the shared helper so the PDP and the GMC feed agree on the result.
+  const isPreOrder = normalizePreorderFlag(row.is_pre_order, row.release_date)
 
   // Format release_date as a human-readable string if present.
   // Input may be a JS Date (neon driver), a date string, or null.
@@ -226,17 +228,15 @@ function mapJoinedRowToProduct(row: DbProductJoined): Product {
     const d = row.release_date instanceof Date
       ? row.release_date
       : new Date(row.release_date)
-      
-    if (d.getTime() < Date.now()) {
-      isPreOrder = false
-    }
 
-    // e.g. "March 15, 2025" — locale-independent, readable on both card & PDP
-    releaseDate = d.toLocaleDateString("en-US", {
-      year:  "numeric",
-      month: "long",
-      day:   "numeric",
-    })
+    if (!Number.isNaN(d.getTime())) {
+      // e.g. "March 15, 2025" — locale-independent, readable on both card & PDP
+      releaseDate = d.toLocaleDateString("en-US", {
+        year:  "numeric",
+        month: "long",
+        day:   "numeric",
+      })
+    }
   }
 
   return {
@@ -276,7 +276,12 @@ function mapJoinedRowToProduct(row: DbProductJoined): Product {
 // ============================================================
 
 /**
- * Fetch top 20 product slugs to pre-render at build time without hitting the 2MB cache limit
+ * Fetch the top product slugs to pre-render at build time. Slugs not in this
+ * list still render on-demand via ISR (PDPs use `revalidate = 3600`).
+ *
+ * 100 chosen as a balance: the previous 20 left ~99.97% of PDPs cold-rendered,
+ * while 500+ noticeably extends build time on Coolify/Vercel. Adjust if build
+ * timing or function-time budgets change.
  */
 export const getPopularProductSlugs = cache(async function getPopularProductSlugs(): Promise<string[]> {
   try {
@@ -288,7 +293,7 @@ export const getPopularProductSlugs = cache(async function getPopularProductSlug
       FROM products p
       WHERE p.is_active = true AND p.slug IS NOT NULL
       ${sql.unsafe(PRODUCT_SORT_SQL)}
-      LIMIT 20
+      LIMIT 100
     `
 
     return rows.map(r => r.slug)

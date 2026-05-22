@@ -1,0 +1,19 @@
+
+> tcg-store@0.1.0 typecheck
+> tsc --noEmit
+
+app/account/addresses/edit/[addressId]/page.tsx(99,21): error TS18047: 'params' is possibly 'null'.
+app/account/page.tsx(101,21): error TS18047: 'searchParams' is possibly 'null'.
+app/admin/products/page-client.tsx(53,40): error TS2345: Argument of type 'ReadonlyURLSearchParams | null' is not assignable to parameter of type 'string | URLSearchParams | Record<string, string> | string[][] | undefined'.
+  Type 'null' is not assignable to type 'string | URLSearchParams | Record<string, string> | string[][] | undefined'.
+app/admin/products/page-client.tsx(64,40): error TS2345: Argument of type 'ReadonlyURLSearchParams | null' is not assignable to parameter of type 'string | URLSearchParams | Record<string, string> | string[][] | undefined'.
+  Type 'null' is not assignable to type 'string | URLSearchParams | Record<string, string> | string[][] | undefined'.
+app/auth/login/page.tsx(33,9): error TS18047: 'searchParams' is possibly 'null'.
+app/auth/login/page.tsx(36,9): error TS18047: 'searchParams' is possibly 'null'.
+app/auth/login/page.tsx(53,26): error TS18047: 'searchParams' is possibly 'null'.
+app/auth/reset-password/page.tsx(33,17): error TS18047: 'searchParams' is possibly 'null'.
+app/auth/verify-email/page.tsx(18,17): error TS18047: 'searchParams' is possibly 'null'.
+app/checkout/success/page.tsx(62,23): error TS18047: 'searchParams' is possibly 'null'.
+hooks/use-analytics.ts(80,26): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+hooks/useProductFilters.ts(22,40): error TS18047: 'searchParams' is possibly 'null'.

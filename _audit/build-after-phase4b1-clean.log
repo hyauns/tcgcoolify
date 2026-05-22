@@ -1,0 +1,60 @@
+
+> tcg-store@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.29
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (CompressionStream at line: 10) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/decrypt.js
+./node_modules/jose/dist/webapi/index.js
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (DecompressionStream at line: 26) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/decrypt.js
+./node_modules/jose/dist/webapi/index.js
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/admin/settings/page.tsx
+55:6  Warning: React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/admin/settings/payments/client.tsx
+68:30  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+68:52  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/auth/login/page.tsx
+163:20  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/cart/cart-page-client.tsx
+258:6  Warning: React Hook React.useEffect has a missing dependency: 'state.items'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/preorder-policy/page.tsx
+61:140  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+unhandledRejection Error [PageNotFoundError]: Cannot find module for page: /_document
+    at getPagePath (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:94:15)
+    at requirePage (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:99:22)
+    at C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:72:65
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 0)
+    at async loadComponentsImpl (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:71:33)
+    at async Object.getDefinedNamedExports (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\build\utils.js:1291:24) {
+  type: 'PageNotFoundError',
+  code: 'ENOENT'
+}

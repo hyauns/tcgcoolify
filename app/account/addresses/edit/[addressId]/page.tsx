@@ -75,7 +75,7 @@ const US_STATES = [
 
 export default function EditAddressPage() {
   const router = useRouter()
-  const params = useParams()
+  const params = useParams<{ addressId: string }>() ?? { addressId: "" }
   useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)

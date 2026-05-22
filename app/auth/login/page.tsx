@@ -30,10 +30,10 @@ export default function LoginPage() {
   const { login, loading, error } = useAuth()
 
   useEffect(() => {
-    if (searchParams.get("verified") === "true") {
+    if (searchParams?.get("verified") === "true") {
       setSuccessMessage("Email verified successfully! You can now log in.")
     }
-    if (searchParams.get("registered") === "true") {
+    if (searchParams?.get("registered") === "true") {
       setSuccessMessage("Account created! Please verify your email then log in.")
     }
   }, [searchParams])
@@ -50,7 +50,7 @@ export default function LoginPage() {
         router.push("/admin/analytics")
         router.refresh()
       } else {
-        const redirect = searchParams.get("redirect") || "/account"
+        const redirect = searchParams?.get("redirect") || "/account"
         router.push(redirect)
         router.refresh()
       }

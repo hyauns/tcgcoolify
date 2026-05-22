@@ -59,7 +59,7 @@ type OrderSuccessPayload = {
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
-  const orderNumber = searchParams.get("orderNumber")
+  const orderNumber = searchParams?.get("orderNumber") ?? null
   const [orderData, setOrderData] = useState<OrderSuccessPayload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

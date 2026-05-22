@@ -1,0 +1,56 @@
+
+> tcg-store@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.29
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/admin/settings/page.tsx
+55:6  Warning: React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/admin/settings/payments/client.tsx
+68:30  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+68:52  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/auth/login/page.tsx
+163:20  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/cart/cart-page-client.tsx
+258:6  Warning: React Hook React.useEffect has a missing dependency: 'state.items'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/preorder-policy/page.tsx
+61:140  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+PageNotFoundError: Cannot find module for page: /api/account/addresses/[addressId]
+    at getPagePath (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:94:15)
+    at requirePage (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:99:22)
+    at C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:103:84
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async loadComponentsImpl (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:103:26)
+    at async C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\build\utils.js:1116:32
+    at async Span.traceAsyncFn (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\trace\trace.js:154:20) {
+  code: 'ENOENT'
+}
+PageNotFoundError: Cannot find module for page: /api/admin/customers
+    at getPagePath (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:94:15)
+    at requirePage (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\require.js:99:22)
+    at C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:103:84
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async loadComponentsImpl (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\server\load-components.js:103:26)
+    at async C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\build\utils.js:1116:32
+    at async Span.traceAsyncFn (C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\trace\trace.js:154:20) {
+  code: 'ENOENT'
+}
+
+> Build error occurred
+Error: Failed to collect page data for /api/account/addresses/[addressId]
+    at C:\Users\admin\Documents\Web Store App\Toy App\b_UOCfTeKk43v-1774686443811\node_modules\next\dist\build\utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  type: 'Error'
+}

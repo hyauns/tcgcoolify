@@ -45,7 +45,7 @@ export function PasswordResetTemplate({
               textAlign: "center",
             }}
           >
-            <img src={getLogoUrl()} alt="TCG Lore Operated by TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
+            <img src={getLogoUrl()} alt="TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
             <p style={{ color: "white", margin: "15px 0 0 0", opacity: 0.9, fontSize: "18px" }}>
               Password Reset Request
             </p>
@@ -191,7 +191,7 @@ export function PasswordResetTemplate({
               <a href="tel:+13036683245" style={{ color: "#dc3545", textDecoration: "none" }}>+1 (303) 668-3245</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore Operated by TCG Lore. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -209,11 +209,11 @@ export function getPasswordResetText({
   userAgent,
 }: PasswordResetProps): string {
   return `
-TCG Lore Operated by TCG Lore. - Password Reset Request
+TCG Lore - Password Reset Request
 
 Hello ${firstName}!
 
-We received a request to reset the password for your TCG Lore Operated by TCG Lore. account associated with ${email}.
+We received a request to reset the password for your TCG Lore account associated with ${email}.
 
 If you made this request, click the link below to reset your password. If you didn't request this, you can safely ignore this email.
 
@@ -238,9 +238,9 @@ WHAT TO DO NEXT:
 If you have any questions or concerns, please contact our support team at cs@tcglore.com immediately.
 
 Best regards,
-The TCG Lore Operated by TCG Lore. Security Team
+The TCG Lore Security Team
 
-© 2026 TCG Lore Operated by TCG Lore. All rights reserved.
+© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: +1 (303) 668-3245
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()

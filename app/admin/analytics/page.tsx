@@ -27,7 +27,10 @@ import {
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Download, BarChart3, Target } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 import { format, subDays } from "date-fns"
-import { AnalyticsPDFExporter, type AnalyticsReportData } from "@/lib/pdf-export"
+// AnalyticsPDFExporter (which pulls in jspdf + html2canvas, ~150KB combined)
+// is dynamically imported inside the export handler so it stays out of the
+// admin/analytics initial bundle. Only the type is imported eagerly.
+import type { AnalyticsReportData } from "@/lib/pdf-export"
 import { useToast } from "@/hooks/use-toast"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"]
@@ -189,6 +192,7 @@ export default function AnalyticsPage() {
         },
       }
 
+      const { AnalyticsPDFExporter } = await import("@/lib/pdf-export")
       const exporter = new AnalyticsPDFExporter()
       await exporter.exportReport(reportData)
 

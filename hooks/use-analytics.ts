@@ -77,7 +77,7 @@ export function useAnalytics(enabled: boolean = true) {
   useEffect(() => {
     if (pathname === lastPathRef.current || !enabled) return
     lastPathRef.current = pathname
-    _send("page_view", { pageUrl: pathname })
+    _send("page_view", { pageUrl: pathname ?? undefined })
   }, [pathname, enabled, _send])
 
   /** Track an add-to-cart event */

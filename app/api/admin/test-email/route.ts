@@ -1,23 +1,15 @@
 import { NextResponse } from "next/server"
 import { sendEmailWithRetry, EMAIL_CONFIG } from "@/lib/email/resend-client"
+import { requireAdmin } from "@/lib/auth-guard"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export async function POST(request: Request) {
-  try {
-    // Basic auth check (replace with real admin auth if available)
-    const authHeader = request.headers.get("authorization")
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET || "admin-secret-replace-me"}`) {
-      // In production, this should use actual session auth
-      // For this test, we fall back to a safer basic check or just allow if in dev mode
-      if (process.env.NODE_ENV === "production" && !process.env.CRON_SECRET) {
-         return NextResponse.json({ error: "Unauthorized. Missing CRON_SECRET." }, { status: 401 })
-      } else if (process.env.NODE_ENV === "production" && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-      }
-    }
+  const admin = await requireAdmin()
+  if (admin instanceof NextResponse) return admin
 
+  try {
     const body = await request.json()
     const recipient = body.to || EMAIL_CONFIG.adminEmail
 
@@ -46,21 +38,21 @@ export async function POST(request: Request) {
     })
 
     if (result.success) {
-      return NextResponse.json({ 
-        ok: true, 
-        message: "Test email sent successfully", 
+      return NextResponse.json({
+        ok: true,
+        message: "Test email sent successfully",
         id: result.messageId,
         from: EMAIL_CONFIG.from,
         replyTo: EMAIL_CONFIG.replyTo,
         to: recipient
       })
     } else {
-      return NextResponse.json({ 
-        ok: false, 
+      return NextResponse.json({
+        ok: false,
         error: result.error,
         from: EMAIL_CONFIG.from,
         replyTo: EMAIL_CONFIG.replyTo,
-        to: recipient 
+        to: recipient
       }, { status: 500 })
     }
 

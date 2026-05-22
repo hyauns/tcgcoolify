@@ -72,7 +72,7 @@ export function OrderConfirmationTemplate({
               textAlign: "center",
             }}
           >
-            <img src={getLogoUrl()} alt="TCG Lore Operated by TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
+            <img src={getLogoUrl()} alt="TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
             <p style={{ color: "white", margin: "10px 0 0 0", opacity: 0.9 }}>Order Confirmation</p>
           </div>
 
@@ -109,27 +109,47 @@ export function OrderConfirmationTemplate({
               </table>
             </div>
 
-            {/* Items */}
+            {/* Items — table layout for email-client compatibility.
+                Many clients (Gmail, Outlook, Apple Mail) strip `display: flex`
+                from inline styles, which previously caused the product title
+                and the line total to concatenate (e.g. "Booster Box$111.24"). */}
             <div style={{ margin: "30px 0" }}>
               <h3 style={{ color: "#333", marginBottom: "20px" }}>Items Ordered</h3>
               {items.map((item, index) => (
-                <div
+                <table
                   key={item.id}
+                  cellPadding={0}
+                  cellSpacing={0}
+                  role="presentation"
                   style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
                     borderBottom: index < items.length - 1 ? "1px solid #eee" : "none",
-                    padding: "15px 0",
-                    display: "flex",
-                    alignItems: "center",
                   }}
                 >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: "bold", marginBottom: "5px" }}>{item.name}</div>
-                    <div style={{ color: "#666", fontSize: "14px" }}>
-                      Quantity: {item.quantity} × ${item.price.toFixed(2)}
-                    </div>
-                  </div>
-                  <div style={{ fontWeight: "bold", fontSize: "16px" }}>${(item.quantity * item.price).toFixed(2)}</div>
-                </div>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "15px 12px 15px 0", verticalAlign: "top" }}>
+                        <div style={{ fontWeight: "bold", marginBottom: "5px" }}>{item.name}</div>
+                        <div style={{ color: "#666", fontSize: "14px" }}>
+                          Quantity: {item.quantity} × ${item.price.toFixed(2)}
+                        </div>
+                      </td>
+                      <td
+                        style={{
+                          padding: "15px 0",
+                          verticalAlign: "top",
+                          textAlign: "right",
+                          whiteSpace: "nowrap",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                        }}
+                      >
+                        ${(item.quantity * item.price).toFixed(2)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               ))}
             </div>
 
@@ -155,6 +175,33 @@ export function OrderConfirmationTemplate({
                   </td>
                 </tr>
               </table>
+            </div>
+
+            {/* Payment Verification Note */}
+            <div
+              style={{
+                background: "#fff8e1",
+                padding: "16px 20px",
+                borderRadius: "8px",
+                margin: "20px 0",
+                border: "1px solid #ffe0b2",
+              }}
+            >
+              <h4 style={{ margin: "0 0 8px 0", color: "#8d6e00", fontSize: "14px" }}>
+                Payment verification
+              </h4>
+              <p style={{ margin: 0, color: "#333", fontSize: "13px", lineHeight: "1.5" }}>
+                Your card will not be charged immediately. A $0.00 authorization may be used to confirm that the card is active.
+                Once our payment verification check is complete and your order is prepared for shipment, the final charge will be processed.
+                {" "}
+                <a
+                  href="https://tcglore.com/payment"
+                  style={{ color: "#1976d2", textDecoration: "underline" }}
+                >
+                  Read more here
+                </a>
+                .
+              </p>
             </div>
 
             {/* Shipping Address */}
@@ -209,7 +256,7 @@ export function OrderConfirmationTemplate({
               <a href="tel:+13036683245" style={{ color: "#667eea", textDecoration: "none" }}>+1 (303) 668-3245</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG LORE Operated by TCG Lore. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -233,7 +280,7 @@ export function getOrderConfirmationText({
   trackingNumber,
 }: OrderConfirmationProps): string {
   return `
-Order Confirmation - TCG Lore Operated by TCG Lore.
+Order Confirmation - TCG Lore
 
 Thank you for your order, ${customerName}!
 
@@ -246,13 +293,17 @@ ${trackingNumber ? `Tracking Number: ${trackingNumber}` : ""}
 ${estimatedDelivery ? `Estimated Delivery: ${estimatedDelivery}` : ""}
 
 ITEMS ORDERED:
-${items.map((item) => `${item.name} - Qty: ${item.quantity} × $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}`).join("\n")}
+${items.map((item) => `${item.name}\n  Quantity: ${item.quantity} × $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}`).join("\n\n")}
 
 PRICING:
 Subtotal: $${subtotal.toFixed(2)}
 Shipping: $${shippingCost.toFixed(2)}
 Tax: $${tax.toFixed(2)}
 Total: $${total.toFixed(2)} USD
+
+PAYMENT VERIFICATION:
+Your card will not be charged immediately. A $0.00 authorization may be used to confirm that the card is active. Once our payment verification check is complete and your order is prepared for shipment, the final charge will be processed.
+Read more: https://tcglore.com/payment
 
 SHIPPING ADDRESS:
 ${shippingAddress.name}
@@ -265,12 +316,12 @@ WHAT'S NEXT:
 • You can track your order status in your account
 • Contact us if you have any questions about your order
 
-Thank you for choosing TCG Lore Operated by TCG Lore. for your trading card needs!
+Thank you for choosing TCG Lore for your trading card needs!
 
 Best regards,
-The TCG Lore Operated by TCG Lore. Team
+The TCG Lore Team
 
-© 2026 TCG Lore Operated by TCG Lore. All rights reserved.
+© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: +1 (303) 668-3245
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()

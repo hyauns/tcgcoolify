@@ -1,10 +1,50 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSql } from '@/lib/db-client';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth-guard';
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// Optional URL — accepts http(s) URL, empty string, or null and coerces to null.
+// Image URLs (logo/favicon/hero) come from the admin upload endpoint which writes
+// HTTPS R2 URLs. Social URLs are admin-entered and may legitimately be http or https
+// from various platforms; we accept both to avoid breaking the existing admin UI.
+const optionalUrl = z
+  .union([z.string().url(), z.literal(''), z.null()])
+  .nullish()
+  .transform((v) => (v === '' || v == null ? null : v));
+
+// Free-text string with a max length. Null/empty → null.
+const optionalText = (max: number) =>
+  z
+    .union([z.string().max(max), z.literal(''), z.null()])
+    .nullish()
+    .transform((v) => (v === '' || v == null ? null : v));
+
+// Google site verification meta value — alphanumeric + - _ only, short.
+const googleVerificationToken = z
+  .union([z.string().regex(/^[A-Za-z0-9_-]+$/).max(128), z.literal(''), z.null()])
+  .nullish()
+  .transform((v) => (v === '' || v == null ? null : v));
+
+const settingsSchema = z.object({
+  heroTitle: optionalText(200),
+  heroSubtitle: optionalText(500),
+  heroImageUrl: optionalUrl,
+  logoUrl: optionalUrl,
+  faviconUrl: optionalUrl,
+  seoTitle: optionalText(200),
+  seoDescription: optionalText(500),
+  seoKeywords: optionalText(500),
+  googleSiteVerification: googleVerificationToken,
+  socialFacebook: optionalUrl,
+  socialInstagram: optionalUrl,
+  socialPinterest: optionalUrl,
+  socialTwitter: optionalUrl,
+  socialYoutube: optionalUrl,
+});
 
 export async function GET() {
   try {
@@ -57,17 +97,26 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  try {
-    // Basic verification placeholder check
-    // const user = await checkAdminSession(request);
-    // if (!user) return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+  const admin = await requireAdmin();
+  if (admin instanceof NextResponse) return admin;
 
-    const body = await request.json();
+  try {
+    const rawBody = await request.json();
+
+    const parsed = settingsSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', issues: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+    const body = parsed.data;
+
     const sql = getSql();
-    
+
     const heroTitle = body.heroTitle || "Premium Trading Cards & Collectibles Store";
     const heroSubtitle = body.heroSubtitle || "Discover authentic Magic: The Gathering, Pokemon, Yu-Gi-Oh! cards and rare collectibles. Build legendary decks with our trading card games.";
-    
+
     // Perform Upsert on Neon using raw SQL
     const updatedSettings = await sql`
       INSERT INTO site_settings (

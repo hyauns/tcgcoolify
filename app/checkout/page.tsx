@@ -1043,8 +1043,14 @@ export default function CheckoutPage() {
 
     const subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const taxAmount = calculatedTax ?? 0
-    const shippingAmount = formData.shippingMethod === "express" ? 15.99 : 5.99
-    const totalAmount = subtotal + taxAmount + shippingAmount
+    // Shipping is computed server-side from `shippingMethod` + the server-verified
+    // subtotal (see `lib/shipping.ts` and `app/api/orders/create/route.ts`). The
+    // client just forwards the selected method id; the actual dollar amount the
+    // gateway is charged comes from the server, so a tampered or stale value
+    // here cannot poison the order total. We still send a best-effort
+    // `totalAmount` for legacy compatibility, but the server ignores it.
+    const shippingMethod = formData.shippingMethod
+    const totalAmount = subtotal + taxAmount  // shipping added by server
     // Order number must fit the DB column VARCHAR(20).
     // Format: ORD-{8-char base-36 timestamp}-{5-char random} = 18 chars max.
     // Old format (ORD-{13-digit ts}-{9-char random}) was 27 chars → DB error 22001.
@@ -1074,7 +1080,7 @@ export default function CheckoutPage() {
           items: state.items,
           subtotal,
           taxAmount,
-          shippingAmount,
+          shippingMethod,
           totalAmount,
           // Only physical address fields — card data is sent separately
           shippingAddress: {

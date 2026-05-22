@@ -9,6 +9,13 @@ interface PageProps {
   params: { slug: string }
 }
 
+// Cached HTML/data for PDPs is revalidated every hour. Admin product mutations
+// also trigger `revalidatePath("/products")` / `revalidatePath("/")` via
+// `app/admin/products/actions.ts`, so price/stock changes propagate quickly;
+// this 1-hour ceiling is just a safety net for upstream data that bypasses the
+// admin UI.
+export const revalidate = 3600
+
 // Generate static params for popular products (pre-render at build time)
 export async function generateStaticParams() {
   const slugs = await getPopularProductSlugs()
@@ -139,8 +146,11 @@ export default async function ProductPage({ params }: PageProps) {
     "name": product.name,
     "image": [imageUrl],
     "description": product.description,
+    // SKU is the retailer's own internal identifier — using product.id is legitimate
+    // and consistent with the feed's `g:id`. MPN is intentionally omitted because the
+    // DB has no manufacturer part number; emitting `mpn = product.id` would be
+    // fabricated data and a GMC misrepresentation flag.
     "sku": product.id.toString(),
-    "mpn": product.id.toString(),
     ...(product.brands ? {
       "brand": {
         "@type": "Brand",
@@ -170,7 +180,8 @@ export default async function ProductPage({ params }: PageProps) {
       ...(product.isPreOrder && product.preOrderDate ? { "availabilityStarts": product.preOrderDate } : {}),
       "seller": {
         "@type": "Organization",
-        "name": "TCG Lore LLC"
+        "name": "A Toy Haulerz LLC",
+        "alternateName": "TCG Lore"
       },
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",

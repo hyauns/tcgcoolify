@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
   const { resetPassword, validateResetToken } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const token = searchParams.get("token")
+  const token = searchParams?.get("token") ?? null
 
   useEffect(() => {
     const validateToken = async () => {

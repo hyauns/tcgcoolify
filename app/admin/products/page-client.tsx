@@ -50,7 +50,7 @@ export function ProductsDataTable({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams?.toString() ?? "")
     if (searchInput) {
       params.set("q", searchInput)
     } else {
@@ -61,7 +61,7 @@ export function ProductsDataTable({
   }
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams?.toString() ?? "")
     params.set("page", newPage.toString())
     router.push(`${pathname}?${params.toString()}`)
   }

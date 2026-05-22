@@ -91,11 +91,54 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
   }
 
+  // Reject replays / stale events. The gateway's X-Webhook-Timestamp is an
+  // ISO 8601 string (per WEBHOOK_INTEGRATION_GUIDE.md) and is part of the
+  // signed HMAC input, so the value is tamper-resistant. A 5-minute window
+  // matches Stripe/Shopify defaults and tolerates normal NTP clock skew.
+  const timestampMs = new Date(timestamp).getTime()
+  if (!Number.isFinite(timestampMs) || Math.abs(Date.now() - timestampMs) > 5 * 60 * 1000) {
+    console.error("[gateway-webhook] Stale or invalid timestamp:", timestamp)
+    return NextResponse.json({ error: "Stale or invalid timestamp" }, { status: 400 })
+  }
+
   let payload: GatewayWebhookPayload
   try {
     payload = JSON.parse(rawBody) as GatewayWebhookPayload
   } catch {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 })
+  }
+
+  // Idempotency: every gateway delivery is keyed by payload.event_id, which is
+  // signed via HMAC because it lives in rawBody. First delivery inserts a row
+  // and runs the rest of the handler normally. Gateway retries of the same
+  // event_id raise unique_violation (SQLSTATE 23505) → we ack 200 with no
+  // further side effects so the gateway stops retrying.
+  //
+  // PRE-DEPLOY REQUIREMENT: scripts/15-create-processed-webhook-events.sql
+  // MUST be applied to Neon BEFORE this code reaches production. Until the
+  // table exists, every webhook will fail with 42P01 (undefined_table) and
+  // orders will stay PENDING. See _audit/21-PHASE-4C-3B-EXECUTION-REPORT.md.
+  const eventId = payload?.event_id || req.headers.get("X-Webhook-Event-ID")
+  if (!eventId) {
+    console.error("[gateway-webhook] Missing event_id in payload + header")
+    return NextResponse.json({ error: "Missing event_id" }, { status: 400 })
+  }
+
+  const idemSql = getSqlConnection()
+  try {
+    await idemSql`
+      INSERT INTO processed_webhook_events (event_id, event_type, transaction_id)
+      VALUES (${eventId}, ${eventName}, ${payload.transaction_id || null})
+    `
+  } catch (err: unknown) {
+    const code = (err as { code?: string } | null)?.code
+    if (code === "23505") {
+      console.log(`[gateway-webhook] Duplicate event_id=${eventId} — ack 200 with no side effects`)
+      return NextResponse.json({ ok: true, duplicate: true }, { status: 200 })
+    }
+    const message = (err as { message?: string } | null)?.message
+    console.error("[gateway-webhook] Idempotency INSERT failed:", code, message)
+    return NextResponse.json({ error: "Idempotency check failed" }, { status: 500 })
   }
 
   try {
@@ -206,13 +249,20 @@ export async function POST(req: NextRequest) {
               parsedShipping = typeof order.shipping_address === "string" ? JSON.parse(order.shipping_address) : order.shipping_address
             } catch (e) { parsedShipping = null }
 
-            const shippingName = parsedShipping?.firstName ? `${parsedShipping.firstName} ${parsedShipping.lastName || ''}`.trim() : payload.buyer_name || "Customer"
+            // Read address fields from the stored shipping_address JSON. The
+            // server canonicalises keys to snake_case via sanitizeAddress()
+            // in orders/create, but we also accept camelCase variants for
+            // forward compatibility — same pattern as orders/complete.
+            const sFirstName = parsedShipping?.first_name ?? parsedShipping?.firstName ?? ""
+            const sLastName  = parsedShipping?.last_name  ?? parsedShipping?.lastName  ?? ""
+            const composedName = `${sFirstName} ${sLastName}`.trim()
+            const shippingName = composedName || payload.buyer_name || "Customer"
 
             const orderEmailData = {
               orderId: String(existingTx.order_id),
               orderNumber: order.order_number,
               customerId: existingTx.customer_id || '',
-              customerEmail: order.customer_email || "cs@tcglore.com", 
+              customerEmail: order.customer_email || "cs@tcglore.com",
               customerPhone: "",
               paymentMethodId: "",
               transactionId: transaction_id,
@@ -227,10 +277,18 @@ export async function POST(req: NextRequest) {
               estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
               shippingAddress: {
                 name: shippingName,
-                street: parsedShipping?.address1 || "Address not provided",
+                street:
+                  parsedShipping?.address_line1 ??
+                  parsedShipping?.address1 ??
+                  parsedShipping?.addressLine1 ??
+                  "Address not provided",
                 city: parsedShipping?.city || "City not provided",
                 state: parsedShipping?.state || "State not provided",
-                zipCode: parsedShipping?.postalCode || "ZIP not provided",
+                zipCode:
+                  parsedShipping?.postal_code ??
+                  parsedShipping?.zipCode ??
+                  parsedShipping?.postalCode ??
+                  "ZIP not provided",
                 country: parsedShipping?.country || "Country not provided",
               },
               trackingNumber: order.tracking_number,

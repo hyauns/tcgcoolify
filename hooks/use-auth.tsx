@@ -1,7 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
+/**
+ * Auth Context — single source of truth for the client-side session.
+ *
+ * One AuthProvider wraps the app at `app/providers.tsx`. It calls
+ * /api/auth/session exactly once per mount (guarded against React 18
+ * StrictMode double-invoke) and exposes the same state + actions to
+ * every consumer via `useAuth()`. Previously, each `useAuth()` call
+ * ran its own fetch + held its own local state, so a single page load
+ * fired 5–10 /api/auth/session requests and `login()` only updated the
+ * caller's component (Header wouldn't refresh until next mount).
+ *
+ * Public API is unchanged from the prior standalone-hook version, so
+ * consumers (`Header`, `account/page`, `admin/layout`, `checkout/page`,
+ * `auth/login`, etc.) do not need to be touched.
+ */
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import type React from "react"
 import { useRouter } from "next/navigation"
+
+// ── Public types ────────────────────────────────────────────────────────────
 
 export interface User {
   user_id: string
@@ -24,7 +51,43 @@ export interface AuthState {
   error: string | null
 }
 
-export function useAuth() {
+interface RegisterPayload {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
+interface AuthContextValue extends AuthState {
+  login: (
+    email: string,
+    password: string,
+    rememberMe?: boolean,
+  ) => Promise<{ success: boolean; user?: User; error?: string }>
+  register: (
+    userData: RegisterPayload,
+  ) => Promise<{ success: boolean; message?: string; error?: string }>
+  logout: () => Promise<void>
+  forgotPassword: (
+    email: string,
+  ) => Promise<{ success: boolean; message?: string }>
+  resetPassword: (
+    token: string,
+    newPassword: string,
+  ) => Promise<{ success: boolean; message?: string; error?: string }>
+  validateResetToken: (
+    token: string,
+  ) => Promise<{ valid: boolean; email?: string; error?: string }>
+  checkSession: () => Promise<void>
+  isAuthenticated: boolean
+  isAdmin: boolean
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null)
+
+// ── Provider ────────────────────────────────────────────────────────────────
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
     loading: true,
@@ -32,60 +95,79 @@ export function useAuth() {
   })
   const router = useRouter()
 
-  // Check session on mount
-  useEffect(() => {
-    checkSession()
+  // StrictMode runs effects twice in dev. `initRef` ensures we only kick off
+  // the initial session fetch on the first effect pass per real mount.
+  const initRef = useRef(false)
+
+  // If two callers somehow race (e.g. a manual `checkSession()` while the
+  // initial one is still in flight) they share the same network request.
+  const inflightSessionRef = useRef<Promise<void> | null>(null)
+
+  const checkSession = useCallback(async (): Promise<void> => {
+    if (inflightSessionRef.current) {
+      return inflightSessionRef.current
+    }
+
+    const p = (async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          credentials: "include",
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setState({ user: data.user, loading: false, error: null })
+        } else {
+          // 401 = not logged in. Treat as expected; do not log as an error.
+          setState({ user: null, loading: false, error: null })
+        }
+      } catch {
+        setState({ user: null, loading: false, error: "Session check failed" })
+      } finally {
+        inflightSessionRef.current = null
+      }
+    })()
+
+    inflightSessionRef.current = p
+    return p
   }, [])
 
-  const checkSession = async () => {
-    try {
-      const response = await fetch("/api/auth/session", {
-        credentials: "include",
-      })
-      if (response.ok) {
+  useEffect(() => {
+    if (initRef.current) return
+    initRef.current = true
+    void checkSession()
+  }, [checkSession])
+
+  const login = useCallback(
+    async (email: string, password: string, rememberMe = false) => {
+      setState((prev) => ({ ...prev, loading: true, error: null }))
+
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password, rememberMe }),
+        })
+
         const data = await response.json()
-        setState({ user: data.user, loading: false, error: null })
-      } else {
-        setState({ user: null, loading: false, error: null })
+
+        if (response.ok) {
+          setState({ user: data.user, loading: false, error: null })
+          return { success: true, user: data.user as User }
+        } else {
+          setState((prev) => ({ ...prev, loading: false, error: data.error }))
+          return { success: false, error: data.error }
+        }
+      } catch {
+        const errorMessage = "Login failed. Please try again."
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }))
+        return { success: false, error: errorMessage }
       }
-    } catch {
-      setState({ user: null, loading: false, error: "Session check failed" })
-    }
-  }
+    },
+    [],
+  )
 
-  const login = async (email: string, password: string, rememberMe = false) => {
-    setState((prev) => ({ ...prev, loading: true, error: null }))
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password, rememberMe }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setState({ user: data.user, loading: false, error: null })
-        return { success: true, user: data.user }
-      } else {
-        setState((prev) => ({ ...prev, loading: false, error: data.error }))
-        return { success: false, error: data.error }
-      }
-    } catch {
-      const errorMessage = "Login failed. Please try again."
-      setState((prev) => ({ ...prev, loading: false, error: errorMessage }))
-      return { success: false, error: errorMessage }
-    }
-  }
-
-  const register = async (userData: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-  }) => {
+  const register = useCallback(async (userData: RegisterPayload) => {
     setState((prev) => ({ ...prev, loading: true, error: null }))
 
     try {
@@ -104,14 +186,14 @@ export function useAuth() {
         setState((prev) => ({ ...prev, loading: false, error: data.error }))
         return { success: false, error: data.error }
       }
-    } catch (error) {
+    } catch {
       const errorMessage = "Registration failed. Please try again."
       setState((prev) => ({ ...prev, loading: false, error: errorMessage }))
       return { success: false, error: errorMessage }
     }
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
@@ -121,10 +203,12 @@ export function useAuth() {
       router.push("/auth/login")
     } catch (error) {
       console.error("Logout error:", error)
+      // Still clear local state so the UI does not pretend the user is logged in
+      setState({ user: null, loading: false, error: null })
     }
-  }
+  }, [router])
 
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = useCallback(async (email: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }))
 
     try {
@@ -141,63 +225,95 @@ export function useAuth() {
         success: response.ok,
         message: data.message || data.error,
       }
-    } catch (error) {
+    } catch {
       setState((prev) => ({ ...prev, loading: false, error: "Request failed" }))
       return { success: false, message: "Request failed. Please try again." }
     }
-  }
+  }, [])
 
-  const resetPassword = async (token: string, newPassword: string) => {
-    setState((prev) => ({ ...prev, loading: true, error: null }))
+  const resetPassword = useCallback(
+    async (token: string, newPassword: string) => {
+      setState((prev) => ({ ...prev, loading: true, error: null }))
 
-    try {
-      const response = await fetch("/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password: newPassword }),
-      })
+      try {
+        const response = await fetch("/api/auth/reset-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, password: newPassword }),
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (response.ok) {
-        setState((prev) => ({ ...prev, loading: false, error: null }))
-        return { success: true, message: data.message }
-      } else {
-        setState((prev) => ({ ...prev, loading: false, error: data.error }))
-        return { success: false, error: data.error }
+        if (response.ok) {
+          setState((prev) => ({ ...prev, loading: false, error: null }))
+          return { success: true, message: data.message }
+        } else {
+          setState((prev) => ({ ...prev, loading: false, error: data.error }))
+          return { success: false, error: data.error }
+        }
+      } catch {
+        const errorMessage = "Password reset failed. Please try again."
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }))
+        return { success: false, error: errorMessage }
       }
-    } catch (error) {
-      const errorMessage = "Password reset failed. Please try again."
-      setState((prev) => ({ ...prev, loading: false, error: errorMessage }))
-      return { success: false, error: errorMessage }
-    }
-  }
+    },
+    [],
+  )
 
-  const validateResetToken = async (token: string) => {
+  const validateResetToken = useCallback(async (token: string) => {
     try {
-      const response = await fetch(`/api/auth/reset-password/validate?token=${encodeURIComponent(token)}`)
+      const response = await fetch(
+        `/api/auth/reset-password/validate?token=${encodeURIComponent(token)}`,
+      )
       if (response.ok) {
         const data = await response.json()
-        return { valid: data.valid, email: data.email }
+        return { valid: data.valid as boolean, email: data.email as string | undefined }
       } else {
         const data = await response.json()
-        return { valid: false, error: data.error || "Invalid token" }
+        return { valid: false, error: (data.error as string) || "Invalid token" }
       }
     } catch {
       return { valid: false, error: "Failed to validate token" }
     }
-  }
+  }, [])
 
-  return {
-    ...state,
-    login,
-    register,
-    logout,
-    forgotPassword,
-    resetPassword,
-    validateResetToken,
-    checkSession,
-    isAuthenticated: !!state.user,
-    isAdmin: state.user?.role === "admin",
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      ...state,
+      login,
+      register,
+      logout,
+      forgotPassword,
+      resetPassword,
+      validateResetToken,
+      checkSession,
+      isAuthenticated: !!state.user,
+      isAdmin: state.user?.role === "admin",
+    }),
+    [
+      state,
+      login,
+      register,
+      logout,
+      forgotPassword,
+      resetPassword,
+      validateResetToken,
+      checkSession,
+    ],
+  )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+// ── Hook ────────────────────────────────────────────────────────────────────
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext)
+  if (!ctx) {
+    throw new Error(
+      "useAuth() must be used inside <AuthProvider>. " +
+        "AuthProvider is mounted in app/providers.tsx — make sure your component is rendered within Providers.",
+    )
   }
+  return ctx
 }

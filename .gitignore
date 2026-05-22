@@ -39,3 +39,6 @@ db_backups/
 
 pgsql/
 tmp/
+
+# Claude Code workspace state (session transcripts, memory, settings)
+.claude/

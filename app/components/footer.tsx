@@ -103,6 +103,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/authenticity"
+                  className="text-black hover:text-[rgb(37,99,235)] transition-colors text-sm"
+                >
+                  Authenticity &amp; Trust
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/payment"
                   className="text-black hover:text-[rgb(37,99,235)] transition-colors text-sm"
                 >

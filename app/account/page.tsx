@@ -98,7 +98,7 @@ export default function AccountPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [orderDetailsOpen, setOrderDetailsOpen] = useState(false)
 
-  const activeTab = searchParams.get("tab") || "overview"
+  const activeTab = searchParams?.get("tab") || "overview"
 
   // ─── SWR data fetching (only runs when authenticated) ──────────────────────
   const shouldFetch = isAuthenticated && !!user

@@ -37,7 +37,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
               textAlign: "center",
             }}
           >
-            <img src={getLogoUrl()} alt="TCG Lore Operated by TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
+            <img src={getLogoUrl()} alt="TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
             <p style={{ color: "white", margin: "15px 0 0 0", opacity: 0.9, fontSize: "18px" }}>
               Password Changed Successfully
             </p>
@@ -175,7 +175,7 @@ export function PasswordChangedTemplate({ firstName, email, timestamp, ipAddress
               <a href="tel:+13036683245" style={{ color: "#28a745", textDecoration: "none" }}>+1 (303) 668-3245</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore Operated by TCG Lore. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -192,11 +192,11 @@ export function getPasswordChangedText({
   userAgent,
 }: PasswordChangedProps): string {
   return `
-TCG Lore Operated by TCG Lore. - Password Changed Successfully
+TCG Lore - Password Changed Successfully
 
 Hello ${firstName}!
 
-This is a confirmation that the password for your TCG Lore Operated by TCG Lore. account ${email} has been successfully changed.
+This is a confirmation that the password for your TCG Lore account ${email} has been successfully changed.
 
 ✅ PASSWORD UPDATED
 Your account is now secured with your new password
@@ -212,7 +212,7 @@ If you didn't change your password, your account may have been compromised. Plea
 • Consider enabling two-factor authentication
 
 SECURITY TIPS:
-• Use a unique password for your TCG Lore Operated by TCG Lore. account
+• Use a unique password for your TCG Lore account
 • Consider using a password manager
 • Enable two-factor authentication for extra security
 • Never share your password with anyone
@@ -223,9 +223,9 @@ Contact Support: ${getSiteUrl()}/contact
 If you have any questions about your account security, please don't hesitate to contact our support team.
 
 Best regards,
-The TCG Lore Operated by TCG Lore. Security Team
+The TCG Lore Security Team
 
-© 2026 TCG Lore Operated by TCG Lore. All rights reserved.
+© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: +1 (303) 668-3245
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()

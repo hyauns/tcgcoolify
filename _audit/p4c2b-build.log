@@ -1,0 +1,386 @@
+
+> tcg-store@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.29
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (CompressionStream at line: 10) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/decrypt.js
+./node_modules/jose/dist/webapi/index.js
+
+./node_modules/jose/dist/webapi/lib/deflate.js
+A Node.js API is used (DecompressionStream at line: 26) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+
+Import trace for requested module:
+./node_modules/jose/dist/webapi/lib/deflate.js
+./node_modules/jose/dist/webapi/jwe/flattened/decrypt.js
+./node_modules/jose/dist/webapi/index.js
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/admin/settings/page.tsx
+55:6  Warning: React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/admin/settings/payments/client.tsx
+68:30  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+68:52  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/auth/login/page.tsx
+163:20  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/cart/cart-page-client.tsx
+258:6  Warning: React Hook React.useEffect has a missing dependency: 'state.items'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/preorder-policy/page.tsx
+61:140  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+CRITICAL: NEXT_PUBLIC_SITE_URL is missing in production. App may break. Set it to https://tcglore.com
+   Generating static pages (0/146) ...
+   Generating static pages (36/146) 
+[products] product_lookup_success slug="armory-deck-zyggy" id=43009 (463ms)
+[products] product_lookup_success slug="armory-deck-zyggy" id=43009 (484ms)
+[products] product_lookup_success slug="timeless-bonds-booster-box-case" id=25614 (454ms)
+[products] product_lookup_success slug="timeless-bonds-booster-box-case" id=25614 (500ms)
+[products] product_lookup_success slug="dual-revolution-booster-box-case" id=25690 (463ms)
+[products] product_lookup_success slug="dual-revolution-booster-box-case" id=25690 (485ms)
+[products] product_lookup_success slug="dual-revolution-booster-box" id=25535 (465ms)
+[products] product_lookup_success slug="dual-revolution-booster-box" id=25535 (496ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-box-case" id=25692 (494ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-box-case" id=25692 (513ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-box" id=25649 (502ms)
+[products] product_lookup_success slug="mega-zygarde-ex-premium-collection-case" id=23612 (522ms)
+[products] product_lookup_success slug="mega-zygarde-ex-premium-collection-case" id=23612 (538ms)
+[products] product_lookup_success slug="timeless-bonds-booster-box" id=25636 (526ms)
+[products] product_lookup_success slug="timeless-bonds-booster-box" id=25636 (562ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-display-case" id=23578 (550ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-display-case" id=23578 (574ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-box" id=25649 (556ms)
+[products] product_lookup_success slug="mega-moonlit-tin-case" id=23522 (560ms)
+[products] product_lookup_success slug="chaos-rising-booster-bundle-case" id=23625 (548ms)
+[products] product_lookup_success slug="chaos-rising-booster-bundle-case" id=23625 (576ms)
+[products] product_lookup_success slug="the-time-of-battle-booster-box" id=18794 (550ms)
+[products] product_lookup_success slug="the-time-of-battle-booster-box" id=18794 (589ms)
+[products] product_lookup_success slug="marvel-super-heroes-jumpstart-booster-display-case" id=21354 (551ms)
+[products] product_lookup_success slug="marvel-super-heroes-jumpstart-booster-display-case" id=21354 (585ms)
+[products] product_lookup_success slug="mega-moonlit-tin-case" id=23522 (600ms)
+[products] product_lookup_success slug="the-time-of-battle-booster-box-case" id=18983 (564ms)
+[products] product_lookup_success slug="the-time-of-battle-booster-box-case" id=18983 (597ms)
+[products] product_lookup_success slug="disney-lorcana-wilds-unknown-booster-box" id=9489 (455ms)
+[products] product_lookup_success slug="disney-lorcana-wilds-unknown-booster-box" id=9489 (472ms)
+[products] product_lookup_success slug="league-battle-deck-case-mega-lucario-ex" id=9423 (460ms)
+[products] product_lookup_success slug="league-battle-deck-case-mega-lucario-ex" id=9423 (478ms)
+[products] product_lookup_success slug="disney-lorcana-wilds-unknown-booster-box-case" id=10098 (465ms)
+[products] product_lookup_success slug="disney-lorcana-wilds-unknown-booster-box-case" id=10098 (464ms)
+[products] product_lookup_success slug="mega-moonlit-tin-mega-gengar-ex" id=9399 (463ms)
+[products] product_lookup_success slug="mega-moonlit-tin-mega-gengar-ex" id=9399 (481ms)
+[products] product_lookup_success slug="mega-moonlit-tin-mega-clefable-ex" id=9409 (467ms)
+[products] product_lookup_success slug="mega-moonlit-tin-mega-clefable-ex" id=9409 (468ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-set-of-5" id=9418 (471ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-set-of-5" id=9418 (470ms)
+[products] product_lookup_success slug="chaos-rising-elite-trainer-box-case" id=8363 (465ms)
+[products] product_lookup_success slug="chaos-rising-elite-trainer-box-case" id=8363 (467ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-display" id=9365 (462ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-display" id=9365 (485ms)
+[products] product_lookup_success slug="chaos-rising-build-battle-display" id=7987 (449ms)
+[products] product_lookup_success slug="chaos-rising-build-battle-display" id=7987 (463ms)
+[products] product_lookup_success slug="chaos-rising-pokemon-center-elite-trainer-box" id=7326 (460ms)
+[products] product_lookup_success slug="chaos-rising-pokemon-center-elite-trainer-box" id=7326 (470ms)
+[products] product_lookup_success slug="mega-zygarde-ex-premium-collection" id=7214 (463ms)
+[products] product_lookup_success slug="mega-zygarde-ex-premium-collection" id=7214 (482ms)
+[products] product_lookup_success slug="chaos-rising-build-battle-box" id=7467 (463ms)
+[products] product_lookup_success slug="chaos-rising-build-battle-box" id=7467 (470ms)
+[products] product_lookup_success slug="chaos-rising-booster-box-case" id=7143 (464ms)
+[products] product_lookup_success slug="chaos-rising-booster-box-case" id=7143 (465ms)
+[products] product_lookup_success slug="battles-of-legend-glorious-gallery-booster-box-1st-edition" id=5386 (464ms)
+[products] product_lookup_success slug="battles-of-legend-glorious-gallery-booster-box-1st-edition" id=5386 (474ms)
+[products] product_lookup_success slug="chaos-rising-booster-box" id=6838 (466ms)
+[products] product_lookup_success slug="chaos-rising-booster-box" id=6838 (482ms)
+[products] product_lookup_success slug="chaos-rising-elite-trainer-box" id=6845 (472ms)
+[products] product_lookup_success slug="chaos-rising-elite-trainer-box" id=6845 (486ms)
+[products] product_lookup_success slug="marvel-super-heroes-prerelease-pack-case" id=2545 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-prerelease-pack-case" id=2545 (479ms)
+[products] product_lookup_success slug="blazing-dominion-booster-box-1st-edition" id=5205 (472ms)
+[products] product_lookup_success slug="blazing-dominion-booster-box-1st-edition" id=5205 (493ms)
+[products] product_lookup_success slug="marvel-super-heroes-gift-bundle-case" id=2515 (468ms)
+[products] product_lookup_success slug="marvel-super-heroes-gift-bundle-case" id=2515 (489ms)
+[products] product_lookup_success slug="marvel-super-heroes-beginner-box-case" id=2516 (468ms)
+[products] product_lookup_success slug="marvel-super-heroes-beginner-box-case" id=2516 (476ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display-master-case" id=2525 (473ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display-master-case" id=2525 (491ms)
+[products] product_lookup_success slug="marvel-super-heroes-draft-night-case" id=2480 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-draft-night-case" id=2480 (473ms)
+   Generating static pages (72/146) 
+[products] product_lookup_success slug="marvel-super-heroes-bundle-case" id=2416 (467ms)
+[products] product_lookup_success slug="marvel-super-heroes-bundle-case" id=2416 (467ms)
+[products] product_lookup_success slug="marvel-super-heroes-scene-box-case" id=2422 (470ms)
+[products] product_lookup_success slug="marvel-super-heroes-scene-box-case" id=2422 (475ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-the-fantastic-four-collectors-edition" id=1780 (480ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-the-fantastic-four-collectors-edition" id=1780 (481ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-case-collectors-edition" id=1122 (450ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-case-collectors-edition" id=1122 (475ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-pack" id=856 (460ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-pack" id=856 (475ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-avengers-assemble-collectors-edition" id=976 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-avengers-assemble-collectors-edition" id=976 (476ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-wakanda-forever-collectors-edition" id=905 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-wakanda-forever-collectors-edition" id=905 (474ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display-case" id=1409 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display-case" id=1409 (476ms)
+[products] product_lookup_success slug="marvel-super-heroes-play-booster-display-case" id=1745 (471ms)
+[products] product_lookup_success slug="marvel-super-heroes-play-booster-display-case" id=1745 (470ms)
+[products] product_lookup_success slug="marvel-super-heroes-scene-box-villains-unleashed" id=902 (469ms)
+[products] product_lookup_success slug="marvel-super-heroes-scene-box-villains-unleashed" id=902 (477ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-doom-prevails-collectors-edition" id=1065 (471ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-doom-prevails-collectors-edition" id=1065 (473ms)
+[products] product_lookup_success slug="marvel-super-heroes-draft-night" id=1467 (472ms)
+[products] product_lookup_success slug="marvel-super-heroes-draft-night" id=1467 (482ms)
+[products] product_lookup_success slug="marvel-super-heroes-prerelease-pack" id=826 (472ms)
+[products] product_lookup_success slug="marvel-super-heroes-prerelease-pack" id=826 (475ms)
+[products] product_lookup_success slug="marvel-super-heroes-bundle" id=817 (469ms)
+[products] product_lookup_success slug="marvel-super-heroes-bundle" id=817 (473ms)
+[products] product_lookup_success slug="marvel-super-heroes-jumpstart-booster-display" id=575 (460ms)
+[products] product_lookup_success slug="marvel-super-heroes-jumpstart-booster-display" id=575 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display" id=515 (466ms)
+[products] product_lookup_success slug="marvel-super-heroes-collector-booster-display" id=515 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-gift-bundle" id=387 (472ms)
+[products] product_lookup_success slug="marvel-super-heroes-gift-bundle" id=387 (467ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-case" id=327 (460ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-case" id=327 (467ms)
+[products] product_lookup_success slug="marvel-super-heroes-play-booster-display" id=348 (464ms)
+[products] product_lookup_success slug="marvel-super-heroes-play-booster-display" id=348 (465ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-doom-prevails" id=309 (492ms)
+[products] product_lookup_success slug="marvel-super-heroes-commander-deck-doom-prevails" id=309 (501ms)
+[products] product_lookup_success slug="the-coming-of-galactus-borderless" id=78719 (501ms)
+[products] product_lookup_success slug="the-coming-of-galactus-borderless" id=78719 (508ms)
+[products] product_lookup_success slug="captain-america-super-soldier-borderless" id=78743 (496ms)
+[products] product_lookup_success slug="captain-america-super-soldier-borderless" id=78743 (539ms)
+[products] product_lookup_success slug="the-thing-borderless" id=78763 (464ms)
+[products] product_lookup_success slug="the-thing-borderless" id=78763 (471ms)
+[products] product_lookup_success slug="doctor-doom" id=78754 (480ms)
+[products] product_lookup_success slug="doctor-doom" id=78754 (485ms)
+[products] product_lookup_success slug="namor-the-sub-mariner-borderless" id=78761 (468ms)
+[products] product_lookup_success slug="namor-the-sub-mariner-borderless" id=78761 (485ms)
+[products] product_lookup_success slug="human-torch-borderless" id=78704 (469ms)
+[products] product_lookup_success slug="human-torch-borderless" id=78704 (486ms)
+[products] product_lookup_success slug="the-coming-of-galactus" id=78626 (471ms)
+[products] product_lookup_success slug="the-coming-of-galactus" id=78626 (493ms)
+[products] product_lookup_success slug="namor-the-sub-mariner" id=78694 (466ms)
+[products] product_lookup_success slug="namor-the-sub-mariner" id=78694 (478ms)
+[products] product_lookup_success slug="invisible-woman-borderless" id=78542 (466ms)
+[products] product_lookup_success slug="invisible-woman-borderless" id=78542 (470ms)
+[products] product_lookup_success slug="captain-america-super-soldier" id=78597 (467ms)
+[products] product_lookup_success slug="captain-america-super-soldier" id=78597 (479ms)
+[products] product_lookup_success slug="bruce-banner-borderless" id=78645 (462ms)
+[products] product_lookup_success slug="bruce-banner-borderless" id=78645 (467ms)
+[products] product_lookup_success slug="bruce-banner" id=78512 (464ms)
+[products] product_lookup_success slug="bruce-banner" id=78512 (479ms)
+[products] product_lookup_success slug="doctor-doom-borderless" id=78578 (489ms)
+[products] product_lookup_success slug="doctor-doom-borderless" id=78578 (493ms)
+[products] product_lookup_success slug="omens-of-the-third-age-prerelease-kit" id=45850 (458ms)
+[products] product_lookup_success slug="omens-of-the-third-age-prerelease-kit" id=45850 (460ms)
+[products] product_lookup_success slug="mister-fantastic-borderless" id=78669 (459ms)
+[products] product_lookup_success slug="mister-fantastic-borderless" id=78669 (471ms)
+[products] product_lookup_success slug="twin-suns-aggressive-negotiations-deck" id=38231 (460ms)
+[products] product_lookup_success slug="twin-suns-aggressive-negotiations-deck" id=38231 (463ms)
+[products] product_lookup_success slug="twin-suns-against-the-odds-deck" id=36853 (464ms)
+[products] product_lookup_success slug="twin-suns-against-the-odds-deck" id=36853 (466ms)
+[products] product_lookup_success slug="twin-suns-master-and-apprentice-deck" id=38791 (465ms)
+[products] product_lookup_success slug="twin-suns-master-and-apprentice-deck" id=38791 (490ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-pack" id=25686 (461ms)
+[products] product_lookup_success slug="digital-world-shambala-booster-pack" id=25686 (465ms)
+[products] product_lookup_success slug="beatbreak-starter-deck" id=25624 (462ms)
+[products] product_lookup_success slug="beatbreak-starter-deck" id=25624 (479ms)
+[products] product_lookup_success slug="data-squad-starter-deck" id=25580 (543ms)
+[products] product_lookup_success slug="data-squad-starter-deck" id=25580 (547ms)
+   Generating static pages (109/146) 
+[products] product_lookup_success slug="dual-revolution-booster-pack" id=25607 (492ms)
+[products] product_lookup_success slug="dual-revolution-booster-pack" id=25607 (494ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-gallade-goomy" id=23596 (485ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-gallade-goomy" id=23596 (491ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-salamence-litleo" id=23606 (490ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-salamence-litleo" id=23606 (505ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-feraligatr-budew" id=23560 (473ms)
+[products] product_lookup_success slug="lumiose-city-mini-tin-feraligatr-budew" id=23560 (476ms)
+[products] product_lookup_success slug="mr-incredible-super-strong" id=12101 (472ms)
+[products] product_lookup_success slug="mr-incredible-super-strong" id=12101 (514ms)
+[products] product_lookup_success slug="mike-wazowski-well-rounded-entertainer" id=12094 (462ms)
+[products] product_lookup_success slug="mike-wazowski-well-rounded-entertainer" id=12094 (464ms)
+[products] product_lookup_success slug="daisy-duck-trendy-traveler" id=12092 (461ms)
+[products] product_lookup_success slug="daisy-duck-trendy-traveler" id=12092 (463ms)
+[products] product_lookup_success slug="bo-peep-caring-shepherd" id=12088 (463ms)
+[products] product_lookup_success slug="bo-peep-caring-shepherd" id=12088 (470ms)
+[products] product_lookup_success slug="audrey-ramirez-gutsy-mechanic" id=12091 (465ms)
+[products] product_lookup_success slug="audrey-ramirez-gutsy-mechanic" id=12091 (465ms)
+[products] product_lookup_success slug="merida-defiant-daughter" id=12090 (469ms)
+[products] product_lookup_success slug="merida-defiant-daughter" id=12090 (468ms)
+[products] product_lookup_success slug="queen-of-hearts-impatient-traveler" id=12098 (461ms)
+[products] product_lookup_success slug="queen-of-hearts-impatient-traveler" id=12098 (464ms)
+[products] product_lookup_success slug="gadget-hackwrench-finder-of-lost-parts" id=12099 (465ms)
+[products] product_lookup_success slug="gadget-hackwrench-finder-of-lost-parts" id=12099 (468ms)
+[products] product_lookup_success slug="maleficent-imperious-traveler" id=12097 (460ms)
+[products] product_lookup_success slug="maleficent-imperious-traveler" id=12097 (469ms)
+[products] product_lookup_success slug="dash-parr-lava-runner" id=12093 (466ms)
+[products] product_lookup_success slug="dash-parr-lava-runner" id=12093 (465ms)
+[products] product_lookup_success slug="babyhead-leader-of-sids-toys" id=12089 (466ms)
+[products] product_lookup_success slug="babyhead-leader-of-sids-toys" id=12089 (474ms)
+[products] product_lookup_success slug="jack-jack-parr-incredible-potential" id=12096 (469ms)
+[products] product_lookup_success slug="jack-jack-parr-incredible-potential" id=12096 (471ms)
+[products] product_lookup_success slug="mickey-mouse-expedition-leader" id=12075 (461ms)
+[products] product_lookup_success slug="mickey-mouse-expedition-leader" id=12075 (467ms)
+[products] product_lookup_success slug="mirage-super-recruiter" id=12069 (466ms)
+[products] product_lookup_success slug="mirage-super-recruiter" id=12069 (466ms)
+[products] product_lookup_success slug="incrediboy-buddy-pine" id=12070 (465ms)
+[products] product_lookup_success slug="incrediboy-buddy-pine" id=12070 (473ms)
+[products] product_lookup_success slug="mr-incredible-taking-out-the-trash" id=12081 (463ms)
+[products] product_lookup_success slug="mr-incredible-taking-out-the-trash" id=12081 (482ms)
+[products] product_lookup_success slug="remote-inklands-desert-ruins" id=12082 (530ms)
+[products] product_lookup_success slug="remote-inklands-desert-ruins" id=12082 (533ms)
+[products] product_lookup_success slug="violet-parr-learning-new-powers" id=12076 (498ms)
+[products] product_lookup_success slug="violet-parr-learning-new-powers" id=12076 (533ms)
+[products] product_lookup_success slug="gadget-hackwrench-resourceful-mechanic" id=12071 (515ms)
+[products] product_lookup_success slug="gadget-hackwrench-resourceful-mechanic" id=12071 (528ms)
+ ✓ Generating static pages (146/146)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                              Size     First Load JS
+┌ ○ /                                                    7.01 kB         175 kB
+├ ○ /_not-found                                          148 B          87.9 kB
+├ ○ /about                                               269 B           157 kB
+├ ○ /account                                             12.3 kB         171 kB
+├ ƒ /account/addresses/edit/[addressId]                  6.75 kB         173 kB
+├ ○ /account/addresses/new                               6.5 kB          173 kB
+├ ○ /admin                                               2.91 kB         211 kB
+├ ○ /admin/analytics                                     47.1 kB         284 kB
+├ ○ /admin/customers                                     3.95 kB        99.5 kB
+├ ○ /admin/feeds                                         7.54 kB         132 kB
+├ ○ /admin/orders                                        5.4 kB          133 kB
+├ ƒ /admin/products                                      8.49 kB         123 kB
+├ ƒ /admin/reviews                                       5.3 kB          114 kB
+├ ○ /admin/settings                                      11.3 kB         110 kB
+├ ○ /admin/settings/payments                             5.62 kB         101 kB
+├ ƒ /api/account/addresses                               0 B                0 B
+├ ƒ /api/account/addresses/[addressId]                   0 B                0 B
+├ ƒ /api/account/orders                                  0 B                0 B
+├ ƒ /api/account/profile                                 0 B                0 B
+├ ƒ /api/admin/analytics                                 0 B                0 B
+├ ƒ /api/admin/analytics/export                          0 B                0 B
+├ ƒ /api/admin/customers                                 0 B                0 B
+├ ƒ /api/admin/db-stats                                  0 B                0 B
+├ ƒ /api/admin/feeds                                     0 B                0 B
+├ ƒ /api/admin/feeds/[id]                                0 B                0 B
+├ ƒ /api/admin/low-stock                                 0 B                0 B
+├ ƒ /api/admin/orders                                    0 B                0 B
+├ ƒ /api/admin/orders/[id]                               0 B                0 B
+├ ƒ /api/admin/products/revalidate                       0 B                0 B
+├ ƒ /api/admin/reviews/[id]                              0 B                0 B
+├ ƒ /api/admin/reviews/import                            0 B                0 B
+├ ƒ /api/admin/settings                                  0 B                0 B
+├ ƒ /api/admin/stats                                     0 B                0 B
+├ ƒ /api/admin/test-email                                0 B                0 B
+├ ƒ /api/admin/upload                                    0 B                0 B
+├ ƒ /api/analytics                                       0 B                0 B
+├ ƒ /api/auth/forgot-password                            0 B                0 B
+├ ƒ /api/auth/login                                      0 B                0 B
+├ ƒ /api/auth/logout                                     0 B                0 B
+├ ƒ /api/auth/register                                   0 B                0 B
+├ ƒ /api/auth/resend-verification                        0 B                0 B
+├ ƒ /api/auth/reset-password                             0 B                0 B
+├ ƒ /api/auth/reset-password/validate                    0 B                0 B
+├ ƒ /api/auth/session                                    0 B                0 B
+├ ƒ /api/auth/verify-email                               0 B                0 B
+├ ƒ /api/cart                                            0 B                0 B
+├ ƒ /api/checkout/process                                0 B                0 B
+├ ƒ /api/contact                                         0 B                0 B
+├ ƒ /api/cron/sync-preorders                             0 B                0 B
+├ ƒ /api/feeds/[uuid]                                    0 B                0 B
+├ ƒ /api/health                                          0 B                0 B
+├ ƒ /api/health/db                                       0 B                0 B
+├ ƒ /api/orders/complete                                 0 B                0 B
+├ ƒ /api/orders/create                                   0 B                0 B
+├ ƒ /api/reviews                                         0 B                0 B
+├ ƒ /api/search                                          0 B                0 B
+├ ƒ /api/taxes/calculate                                 0 B                0 B
+├ ƒ /api/version                                         0 B                0 B
+├ ƒ /api/webhooks/gateway                                0 B                0 B
+├ ƒ /api/wishlist                                        0 B                0 B
+├ ○ /auth/demo-reset                                     589 B          88.3 kB
+├ ○ /auth/forgot-password                                3.46 kB         162 kB
+├ ○ /auth/login                                          5.01 kB         164 kB
+├ ○ /auth/register                                       5.64 kB         165 kB
+├ ○ /auth/resend-verification                            2.57 kB         162 kB
+├ ○ /auth/reset-password                                 3.88 kB         163 kB
+├ ○ /auth/verify-email                                   2.09 kB         161 kB
+├ ○ /authenticity                                        269 B           157 kB
+├ ○ /best-price-guarantee                                7.61 kB         167 kB
+├ ○ /cart                                                7.66 kB         172 kB
+├ ○ /checkout                                            19.3 kB         181 kB
+├ ○ /checkout/success                                    6.22 kB         165 kB
+├ ○ /contact                                             8.72 kB         168 kB
+├ ○ /cookies                                             3.66 kB         163 kB
+├ ƒ /explore/[brand]/[attribute]                         606 B           103 kB
+├ ○ /faq                                                 269 B           157 kB
+├ ○ /payment                                             269 B           157 kB
+├ ○ /payment-and-orders                                  269 B           157 kB
+├ ○ /payment-orders                                      269 B           157 kB
+├ ○ /preorder-info                                       9.47 kB         168 kB
+├ ○ /preorder-policy                                     269 B           157 kB
+├ ○ /privacy                                             269 B           157 kB
+├ ƒ /products                                            10.5 kB         183 kB
+├ ● /products/[slug]                                     12.1 kB         176 kB
+├   ├ /products/armory-deck-zyggy
+├   ├ /products/digital-world-shambala-booster-box-case
+├   ├ /products/dual-revolution-booster-box-case
+├   └ [+97 more paths]
+├ ○ /returns                                             842 B           157 kB
+├ ○ /robots.txt                                          0 B                0 B
+├ ○ /shipping                                            842 B           157 kB
+├ ○ /sitemap.xml                                         0 B                0 B
+├ ƒ /sitemaps/[file]                                     0 B                0 B
+├ ○ /sitemaps/categories.xml                             0 B                0 B
+├ ○ /sitemaps/core.xml                                   0 B                0 B
+├ ○ /terms                                               269 B           157 kB
+└ ○ /wishlist                                            5.31 kB         172 kB
++ First Load JS shared by all                            87.7 kB
+  ├ chunks/2117-26f2a560e9fd1902.js                      31.8 kB
+  ├ chunks/fd9d1056-ca1dcec96cb49d81.js                  53.6 kB
+  └ other shared chunks (total)                          2.35 kB
+
+
+ƒ Middleware                                             31.3 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+ƒ  (Dynamic)  server-rendered on demand
+

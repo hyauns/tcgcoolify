@@ -6,6 +6,7 @@ import { requireSession } from "@/lib/auth-guard"
 import { getSql } from "@/lib/db-client"
 import { detectCardBrand, encryptPhone, maskPhone, encryptCardNumber, createHash, encryptCvv } from "@/lib/payment-security"
 import { calculateSalesTax } from "@/lib/tax"
+import { calculateShipping } from "@/lib/shipping"
 
 async function resolveCustomerId(sql: any, userId: string): Promise<string | null> {
   if (!userId || userId === "guest") return null
@@ -105,12 +106,16 @@ export async function POST(request: NextRequest) {
       orderNumber,
       items,
       subtotal,
-      shippingAmount,
+      shippingMethod,
       totalAmount,
       shippingAddress: rawShipping,
       billingAddress: rawBilling,
       paymentInfo,
     } = body
+    // `shippingAmount` is intentionally NOT destructured. The server now
+    // recomputes shipping from the chosen method + server-verified subtotal
+    // via `calculateShipping()` so a tampered or stale client value cannot
+    // poison the gateway charge. See _audit/17-PHASE-4C-2-BLOCKER-REPORT.md.
 
     if (!orderNumber || !items || !Array.isArray(items) || !totalAmount) {
       return NextResponse.json({ error: "Missing required order data" }, { status: 400 })
@@ -206,16 +211,23 @@ export async function POST(request: NextRequest) {
       const cleanShipping = sanitizeAddress(rawShipping ?? {})
       const cleanBilling = sanitizeAddress(rawBilling ?? rawShipping ?? {})
 
+      // Canonical shipping cost — computed from the customer's chosen method
+      // and the server-verified subtotal. Mirrors the UI calculation so the
+      // gateway is charged the same amount the customer saw at checkout. Never
+      // read shipping from the client body.
+      const verifiedShippingAmount = calculateShipping(shippingMethod, serverSubtotal)
+      const formattedShippingAmount = Number(verifiedShippingAmount.toFixed(2))
+
       const verifiedTaxAmount = await calculateSalesTax({
         amount: serverSubtotal,
-        shipping: Number(shippingAmount || 0),
+        shipping: verifiedShippingAmount,
         toZip: cleanShipping.postal_code,
         toState: cleanShipping.state,
         toCity: cleanShipping.city,
         toCountry: cleanShipping.country,
       })
 
-      const verifiedTotalAmount = serverSubtotal + Number(shippingAmount || 0) + verifiedTaxAmount
+      const verifiedTotalAmount = serverSubtotal + verifiedShippingAmount + verifiedTaxAmount
       const formattedTotalAmount = Number(verifiedTotalAmount.toFixed(2))
       const formattedTaxAmount = Number(verifiedTaxAmount.toFixed(2))
 
@@ -240,7 +252,7 @@ export async function POST(request: NextRequest) {
         ) VALUES (
           ${customerId ?? "guest"}, ${orderNumber}, 'PENDING',
           ${serverSubtotal}, ${formattedTaxAmount},
-          ${Number(shippingAmount || 0)}, ${formattedTotalAmount},
+          ${formattedShippingAmount}, ${formattedTotalAmount},
           'PENDING',
           ${shippingJson},
           ${billingJson},
@@ -252,10 +264,31 @@ export async function POST(request: NextRequest) {
       timings.insert_order = performance.now() - t1
       t1 = performance.now()
 
-      for (const item of items) {
+      // Batch line-item insert. Same columns, same values, same row order as the
+      // previous per-item loop — just one round-trip to Neon instead of N. Still
+      // inside the existing sql.begin() transaction, so atomicity is unchanged
+      // (any error here rolls back the order row, customer updates, and stock
+      // deductions). The empty-array guard preserves the previous loop's silent
+      // no-op behavior on an empty items array.
+      if (items.length > 0) {
+        const orderItemRows = items.map((item: any) => ({
+          order_id: order.id,
+          product_id: String(item.id),
+          product_name: item.name,
+          quantity: Number(item.quantity),
+          unit_price: Number(item.price),
+          total_price: Number(item.price) * Number(item.quantity),
+        }))
         await sql`
-          INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, total_price)
-          VALUES (${order.id}, ${String(item.id)}, ${item.name}, ${Number(item.quantity)}, ${Number(item.price)}, ${Number(item.price) * Number(item.quantity)})
+          INSERT INTO order_items ${sql(
+            orderItemRows,
+            "order_id",
+            "product_id",
+            "product_name",
+            "quantity",
+            "unit_price",
+            "total_price",
+          )}
         `
       }
 

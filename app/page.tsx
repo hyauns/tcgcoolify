@@ -39,7 +39,12 @@ export const metadata: Metadata = {
 // console error caused by the previous useEffect approach.
 // ============================================================
 
-export const dynamic = "force-dynamic"
+// Homepage has no user-specific data (no cookies/headers/session reads). Admin
+// product mutations call revalidatePath("/") in
+// app/admin/products/actions.ts:70, and admin settings updates call
+// revalidatePath("/", "layout") in app/api/admin/settings/route.ts:151, so this
+// 5-minute interval is just a safety net.
+export const revalidate = 300
 
 export default async function HomePage() {
   const siteSettings = await getSiteSettings()

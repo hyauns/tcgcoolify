@@ -41,7 +41,7 @@ export function EmailVerificationTemplate({
               textAlign: "center",
             }}
           >
-            <img src={getLogoUrl()} alt="TCG Lore Operated by TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
+            <img src={getLogoUrl()} alt="TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
             <p style={{ color: "white", margin: "15px 0 0 0", opacity: 0.9, fontSize: "18px" }}>
               Verify Your Email Address
             </p>
@@ -176,11 +176,11 @@ export function getEmailVerificationText({
   expiresInHours = 24,
 }: EmailVerificationProps): string {
   return `
-TCG Lore LLC. - Verify Your Email Address
+TCG Lore - Verify Your Email Address
 
 Hello ${firstName}!
 
-Thank you for creating an account with TCG Lore Operated by TCG Lore.! To complete your registration and start shopping for your favorite trading cards, please verify your email address.
+Thank you for creating an account with TCG Lore! To complete your registration and start shopping for your favorite trading cards, please verify your email address.
 
 We need to confirm that ${email} is your correct email address.
 
@@ -194,16 +194,16 @@ SECURITY NOTICE:
 
 WHAT'S NEXT:
 • Click the verification link above
-• You'll be redirected to TCG Lore Operated by TCG Lore.
+• You'll be redirected to TCG Lore
 • Start browsing our collection of trading cards
 • Enjoy secure shopping and fast shipping
 
 If you have any questions, our support team is here to help. Email us at cs@tcglore.com.
 
 Best regards,
-The TCG Lore Operated by TCG Lore. Team
+The TCG Lore Team
 
-© 2026 TCG Lore Operated by TCG Lore. All rights reserved.
+© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: +1 (303) 668-3245
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()

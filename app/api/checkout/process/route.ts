@@ -135,7 +135,14 @@ export async function POST(req: Request) {
                 parsedShipping = typeof order.shipping_address === "string" ? JSON.parse(order.shipping_address) : order.shipping_address
               } catch { parsedShipping = null }
 
-              const shippingName = parsedShipping?.firstName ? `${parsedShipping.firstName} ${parsedShipping.lastName || ''}`.trim() : customerName || "Customer"
+              // Read address fields from the stored shipping_address JSON. The
+              // server canonicalises keys to snake_case via sanitizeAddress()
+              // in orders/create, but we also accept camelCase variants for
+              // forward compatibility — same pattern as orders/complete.
+              const sFirstName = parsedShipping?.first_name ?? parsedShipping?.firstName ?? ""
+              const sLastName  = parsedShipping?.last_name  ?? parsedShipping?.lastName  ?? ""
+              const composedName = `${sFirstName} ${sLastName}`.trim()
+              const shippingName = composedName || customerName || "Customer"
 
               const orderEmailData = {
                 orderId: String(finalOrderId),
@@ -156,10 +163,18 @@ export async function POST(req: Request) {
                 estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
                 shippingAddress: {
                   name: shippingName,
-                  street: parsedShipping?.address1 || "Address not provided",
+                  street:
+                    parsedShipping?.address_line1 ??
+                    parsedShipping?.address1 ??
+                    parsedShipping?.addressLine1 ??
+                    "Address not provided",
                   city: parsedShipping?.city || "City not provided",
                   state: parsedShipping?.state || "State not provided",
-                  zipCode: parsedShipping?.postalCode || "ZIP not provided",
+                  zipCode:
+                    parsedShipping?.postal_code ??
+                    parsedShipping?.zipCode ??
+                    parsedShipping?.postalCode ??
+                    "ZIP not provided",
                   country: parsedShipping?.country || "Country not provided",
                 },
                 trackingNumber: order.tracking_number,

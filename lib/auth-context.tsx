@@ -1,22 +1,22 @@
 "use client"
 
 /**
- * auth-context.tsx — compatibility bridge
+ * auth-context.tsx — public entry point for auth state.
  *
- * The entire app imports `useAuth` from this file.
- * Rather than editing every import, this module re-exports the real
- * `useAuth` hook from `hooks/use-auth.tsx` which calls the actual
- * Neon-backed API routes (/api/auth/login, /api/auth/session, etc.)
- * and manages a JWT HTTP-only cookie for session persistence.
+ * The real Context + Provider + hook live in `@/hooks/use-auth`. This file
+ * re-exports them so existing imports (`from "@/lib/auth-context"`) continue
+ * to resolve. Both `<AuthProvider>` here and in `@/hooks/use-auth` are the
+ * same component — there is no longer any no-op shim.
  *
- * The legacy mock (localStorage + hardcoded demo users) has been removed.
+ * Account-page-specific value types (Address, Order, OrderItem) also live
+ * here for historical reasons and remain unchanged.
  */
 
-export { useAuth } from "@/hooks/use-auth"
+export { AuthProvider, useAuth } from "@/hooks/use-auth"
 export type { User, AuthState } from "@/hooks/use-auth"
 
-// Re-export Address and Order types used by account pages so those
-// imports continue to resolve from this path.
+// ── Account/order value types kept here for backward-compatible imports ────
+
 export interface OrderItem {
   id: string
   name: string
@@ -49,12 +49,4 @@ export interface Address {
   country: string
   phone?: string
   isDefault: boolean
-}
-
-// AuthProvider is no longer needed (useAuth is a standalone hook),
-// but we export a no-op wrapper so any existing <AuthProvider> usages
-// in layout files do not throw import errors.
-import type React from "react"
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
 }

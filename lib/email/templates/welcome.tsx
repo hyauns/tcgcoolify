@@ -36,7 +36,7 @@ export function WelcomeTemplate({ firstName, email, discountCode, discountAmount
               textAlign: "center",
             }}
           >
-            <img src={getLogoUrl()} alt="TCG Lore Operated by TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
+            <img src={getLogoUrl()} alt="TCG Lore Logo" width="180" style={{ height: "auto", display: "block", margin: "0 auto" }} />
             <p style={{ color: "white", margin: "10px 0 0 0", fontSize: "20px" }}>Welcome to our community!</p>
             <p style={{ color: "white", margin: "15px 0 0 0", opacity: 0.9, fontSize: "18px" }}>
               Your Trading Card Adventure Begins
@@ -223,7 +223,7 @@ export function WelcomeTemplate({ firstName, email, discountCode, discountAmount
               <a href="tel:+13036683245" style={{ color: "#667eea", textDecoration: "none" }}>+1 (303) 668-3245</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore Operated by TCG Lore. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -234,11 +234,11 @@ export function WelcomeTemplate({ firstName, email, discountCode, discountAmount
 // Plain text version
 export function getWelcomeText({ firstName, email, discountCode, discountAmount }: WelcomeEmailProps): string {
   return `
-Welcome to TCG Lore Operated by TCG Lore.!
+Welcome to TCG Lore!
 
 Hello ${firstName}!
 
-Welcome to the TCG Lore Operated by TCG Lore. family! We're thrilled to have you join our community of trading card enthusiasts.
+Welcome to the TCG Lore family! We're thrilled to have you join our community of trading card enthusiasts.
 
 Your email address ${email} has been verified and your account is now active.
 
@@ -269,9 +269,9 @@ Start shopping: ${getSiteUrl()}/products
 If you have any questions, our support team is here to help. Just reply to this email or contact us through your account.
 
 Happy collecting!
-The TCG Lore Operated by TCG Lore. Team
+The TCG Lore Team
 
-© 2026 TCG Lore Operated by TCG Lore. All rights reserved.
+© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: +1 (303) 668-3245
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()
