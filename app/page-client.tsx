@@ -42,7 +42,6 @@ import { useCart } from "@/lib/cart-context"
 import { useWishlist } from "@/lib/wishlist-context"
 import { QuickViewModal } from "./components/quick-view-modal"
 import { Hero } from "./components/hero"
-import { TrustpilotWidget } from "./components/trustpilot-widget"
 import { useToast } from "@/hooks/use-toast"
 import { generateSlug } from "@/lib/utils"
 import { generateCategorySlug } from "@/lib/product-utils"
@@ -64,13 +63,14 @@ interface Review {
 interface HomePageClientProps {
   heroSettings: SiteSettings
   dataPromise: Promise<[Product[], Product[], Product[], Review[]]>
+  trustpilotSlot?: React.ReactNode
 }
 
 // ============================================================
 // Client Component — all interactive behaviour lives here
 // ============================================================
 
-function HomeContent({ dataPromise }: { dataPromise: Promise<[Product[], Product[], Product[], Review[]]> }) {
+function HomeContent({ dataPromise, trustpilotSlot }: { dataPromise: Promise<[Product[], Product[], Product[], Review[]]>; trustpilotSlot?: React.ReactNode }) {
   const [featuredProducts, bestSellingProducts, preOrderProducts] = use(dataPromise)
 
   const { addItemWithAnimation } = useCart()
@@ -718,9 +718,9 @@ function HomeContent({ dataPromise }: { dataPromise: Promise<[Product[], Product
             </Card>
           </div>
 
-          {/* TrustBox widget - Micro Combo */}
-          <TrustpilotWidget />
-          {/* End TrustBox widget */}
+          {/* Custom-branded reviews badge — see app/components/trustpilot-rating.tsx.
+              Fetched server-side from the public Trustpilot page (no paid sub). */}
+          {trustpilotSlot && <div className="flex justify-center mt-6">{trustpilotSlot}</div>}
         </div>
       </section>
 
@@ -757,7 +757,7 @@ function HomeFallback() {
   )
 }
 
-export default function HomePageClient({ heroSettings, dataPromise }: HomePageClientProps) {
+export default function HomePageClient({ heroSettings, dataPromise, trustpilotSlot }: HomePageClientProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -767,7 +767,7 @@ export default function HomePageClient({ heroSettings, dataPromise }: HomePageCl
         heroImageUrl={heroSettings.heroImageUrl}
       />
       <Suspense fallback={<HomeFallback />}>
-        <HomeContent dataPromise={dataPromise} />
+        <HomeContent dataPromise={dataPromise} trustpilotSlot={trustpilotSlot} />
       </Suspense>
       <Footer />
     </div>
