@@ -627,7 +627,7 @@ export default function PreOrderInfoClient({ preOrderProducts }: PreOrderInfoCli
                       Email Support
                     </Button>
                   </Link>
-                  <Link href="tel:+13036683245">
+                  <Link href="tel:+18884961626">
                     <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100 bg-transparent">
                       <Phone className="w-4 h-4 mr-2" />
                       Call Us

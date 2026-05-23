@@ -371,8 +371,8 @@ export default function ContactFormContent() {
                 <div className="flex items-start space-x-3">
                   <Phone className="h-5 w-5 text-blue-600 mt-1" />
                   <div>
-                    <h4 className="font-semibold">Remote Support Line</h4>
-                    <p className="text-sm text-gray-600"><a href="tel:+13036683245">+1 (303) 668-3245</a></p>
+                    <h4 className="font-semibold">Customer Support</h4>
+                    <p className="text-sm text-gray-600"><a href="tel:+18884961626">(888) 496-1626</a></p>
                   </div>
                 </div>
 

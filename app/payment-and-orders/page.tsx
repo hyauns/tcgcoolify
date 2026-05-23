@@ -363,8 +363,8 @@ export default function PaymentOrdersPage() {
                 <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-3">
                   <Phone className="h-6 w-6 text-blue-600" />
                 </div>
-                <h4 className="font-semibold mb-2">Remote Support</h4>
-                <p className="text-sm text-gray-600 mb-2"><a href="tel:+13036683245" className="text-gray-600">+1 (303) 668-3245</a></p>
+                <h4 className="font-semibold mb-2">Customer Support</h4>
+                <p className="text-sm text-gray-600 mb-2"><a href="tel:+18884961626" className="text-gray-600">(888) 496-1626</a></p>
                 <p className="text-xs text-gray-500">Mon-Fri: 9AM-6PM EST</p>
               </div>
               <div className="text-center">

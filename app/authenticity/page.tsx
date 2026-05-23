@@ -156,9 +156,9 @@ export default function AuthenticityPage() {
                   <Mail className="w-4 h-4" />
                   cs@tcglore.com
                 </a>
-                <a href="tel:+13036683245" className="flex items-center gap-2 text-blue-600 hover:underline">
+                <a href="tel:+18884961626" className="flex items-center gap-2 text-blue-600 hover:underline">
                   <Phone className="w-4 h-4" />
-                  +1 (303) 668-3245
+                  (888) 496-1626
                 </a>
               </div>
               <p className="text-sm text-gray-500 pt-4">

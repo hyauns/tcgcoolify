@@ -144,7 +144,7 @@ export default function PreorderPolicy() {
                   <strong>Email:</strong> <a href="mailto:cs@tcglore.com" className="text-blue-600 hover:underline">cs@tcglore.com</a>
                 </p>
                 <p className="text-gray-700 mb-2">
-                  <strong>Phone:</strong> <a href="tel:+13036683245" className="text-blue-600 hover:underline">+1 (303) 668-3245</a>
+                  <strong>Phone:</strong> <a href="tel:+18884961626" className="text-blue-600 hover:underline">(888) 496-1626</a>
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Address:</strong> 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136, United States

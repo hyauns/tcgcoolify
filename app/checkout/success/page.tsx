@@ -593,7 +593,7 @@ function CheckoutSuccessContent() {
                 <div className="text-center">
                   <Phone className="h-8 w-8 text-green-600 mx-auto mb-2" />
                   <h3 className="font-semibold text-gray-900 mb-1">Phone Support</h3>
-                  <p className="text-green-600">+1 (303) 668-3245</p>
+                  <p className="text-green-600">(888) 496-1626</p>
                   <p className="text-sm text-gray-500">Mon-Fri 9AM-6PM EST</p>
                 </div>
               </div>

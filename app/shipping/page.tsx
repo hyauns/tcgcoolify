@@ -846,7 +846,7 @@ export default function ShippingPage() {
                       <div className="flex items-center gap-3">
                         <Phone className="w-5 h-5 text-blue-600" />
                         <div>
-                          <div className="font-semibold">+1 (303) 668-3245</div>
+                          <div className="font-semibold">(888) 496-1626</div>
                           <div className="text-sm text-gray-600">Mon-Fri 9AM-6PM EST</div>
                         </div>
                       </div>
@@ -894,10 +894,10 @@ export default function ShippingPage() {
                       Email Shipping Team
                     </Button>
                   </Link>
-                  <Link href="tel:+13036683245" className="flex-1">
+                  <Link href="tel:+18884961626" className="flex-1">
                     <Button variant="outline" className="w-full bg-transparent">
                       <Phone className="w-4 h-4 mr-2" />
-                      Call +1 (303) 668-3245
+                      Call (888) 496-1626
                     </Button>
                   </Link>
                 </div>

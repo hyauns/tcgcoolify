@@ -66,7 +66,7 @@ const faqData: FAQCategory[] = [
       {
         question: "How do I return an item?",
         answer:
-          "Contact our customer service team at cs@tcglore.com or call +1 (303) 668-3245 to initiate a return. We'll provide an RMA number and packaging instructions. Refunds are processed within 5–7 business days after we receive and inspect your return.",
+          "Contact our customer service team at cs@tcglore.com or call (888) 496-1626 to initiate a return. We'll provide an RMA number and packaging instructions. Refunds are processed within 5–7 business days after we receive and inspect your return.",
       },
       {
         question: "Who pays for return shipping?",
@@ -155,7 +155,7 @@ const faqData: FAQCategory[] = [
       {
         question: "How can I contact customer service?",
         answer:
-          "You can reach us through our Contact page, email us at cs@tcglore.com, or call us at +1 (303) 668-3245 Monday–Friday 9 AM to 6 PM EST. We typically respond to emails within 24 hours.",
+          "You can reach us through our Contact page, email us at cs@tcglore.com, or call us at (888) 496-1626 Monday–Friday 9 AM to 6 PM EST. We typically respond to emails within 24 hours.",
       },
       {
         question: "Do you ship internationally?",
@@ -267,7 +267,7 @@ export default function FAQPage() {
                 </a>
               </div>
               <p className="mt-6 text-sm text-gray-500">
-                TCG Lore is operated by A Toy Haulerz LLC · cs@tcglore.com · +1 (303) 668-3245
+                TCG Lore is operated by A Toy Haulerz LLC · cs@tcglore.com · (888) 496-1626
               </p>
             </CardContent>
           </Card>

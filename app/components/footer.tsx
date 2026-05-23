@@ -134,10 +134,7 @@ export function Footer() {
               </div>
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-black hover:text-[rgb(37,99,235)] transition-colors mt-0.5" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Remote Customer Support Line</span>
-                  <a href="tel:+13036683245" className="text-black text-sm hover:text-[rgb(37,99,235)] transition-colors">+1 (303) 668-3245</a>
-                </div>
+                <a href="tel:+18884961626" className="text-black text-sm hover:text-[rgb(37,99,235)] transition-colors">(888) 496-1626</a>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-black hover:text-[rgb(37,99,235)] transition-colors flex-shrink-0 mt-0.5" />

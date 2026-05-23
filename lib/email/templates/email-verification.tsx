@@ -157,7 +157,7 @@ export function EmailVerificationTemplate({
               <a href="mailto:cs@tcglore.com" style={{ color: "#667eea", textDecoration: "none" }}>cs@tcglore.com</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>
-              <a href="tel:+13036683245" style={{ color: "#667eea", textDecoration: "none" }}>+1 (303) 668-3245</a>
+              <a href="tel:+18884961626" style={{ color: "#667eea", textDecoration: "none" }}>(888) 496-1626</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
             <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
@@ -204,7 +204,7 @@ Best regards,
 The TCG Lore Team
 
 © 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
-Support: cs@tcglore.com | Phone: +1 (303) 668-3245
+Support: cs@tcglore.com | Phone: (888) 496-1626
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()
 }

@@ -238,8 +238,8 @@ export default function AboutPage() {
                     >
                       cs@tcglore.com
                     </Link>
-                    <a href="tel:+13036683245" className="text-blue-300 hover:text-white transition-colors block mt-2">
-                      +1 (303) 668-3245
+                    <a href="tel:+18884961626" className="text-blue-300 hover:text-white transition-colors block mt-2">
+                      (888) 496-1626
                     </a>
                   </CardContent>
                 </Card>

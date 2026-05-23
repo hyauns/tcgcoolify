@@ -116,7 +116,7 @@ export default async function RootLayout({
     "logo": `${siteUrl}/logo.png`,
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+1-303-668-3245",
+      "telephone": "+1-888-496-1626",
       "contactType": "customer service",
       "email": "cs@tcglore.com",
       "availableLanguage": ["English"]

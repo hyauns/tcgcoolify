@@ -309,7 +309,7 @@ export default function CookiesPage() {
                     <strong>Email:</strong> <a href="mailto:cs@tcglore.com">cs@tcglore.com</a>
                   </li>
                   <li>
-                    <strong>Phone:</strong> <a href="tel:+13036683245">+1 (303) 668-3245</a>
+                    <strong>Phone:</strong> <a href="tel:+18884961626">(888) 496-1626</a>
                   </li>
                   <li>
                     <strong>Mail:</strong> TCG Lore Privacy Team, 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136

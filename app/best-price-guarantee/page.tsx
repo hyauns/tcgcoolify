@@ -272,7 +272,7 @@ export default function BestPriceGuaranteePage() {
                       <h4 className="font-semibold mb-2">Contact Methods:</h4>
                       <ul className="text-sm text-green-700 space-y-1">
                         <li>• Email: cs@tcglore.com</li>
-                        <li>• Phone: +1 (303) 668-3245</li>
+                        <li>• Phone: (888) 496-1626</li>
                         <li>• Live Chat (9 AM - 6 PM EST)</li>
                       </ul>
                     </div>
@@ -615,7 +615,7 @@ export default function BestPriceGuaranteePage() {
                   <Phone className="w-8 h-8" />
                 </div>
                 <h3 className="font-semibold mb-2">Phone Support</h3>
-                <p className="text-blue-100 text-sm mb-2">+1 (303) 668-3245</p>
+                <p className="text-blue-100 text-sm mb-2">(888) 496-1626</p>
                 <Badge variant="secondary" className="bg-white/20 text-white">
                   Mon-Fri 9AM-6PM EST
                 </Badge>

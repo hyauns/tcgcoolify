@@ -291,7 +291,7 @@ export default function PrivacyPolicy() {
                   <strong>Email:</strong> <a href="mailto:cs@tcglore.com">cs@tcglore.com</a>
                 </p>
                 <p className="text-gray-700 mb-2">
-                  <strong>Phone:</strong> <a href="tel:+13036683245">+1 (303) 668-3245</a>
+                  <strong>Phone:</strong> <a href="tel:+18884961626">(888) 496-1626</a>
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Mail:</strong> Privacy Officer, TCG Lore, 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136, United States

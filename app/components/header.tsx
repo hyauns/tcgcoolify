@@ -227,7 +227,7 @@ export function Header() {
             <span>Free shipping on orders over $75</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden sm:inline">Remote Support: +1 (303) 668-3245</span>
+            <span className="hidden sm:inline">Call us: (888) 496-1626</span>
           </div>
         </div>
       </div>
@@ -513,7 +513,7 @@ export function Header() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Phone className="h-4 w-4" />
-                        <a href="tel:+13036683245" className="text-sm text-gray-600">+1 (303) 668-3245</a>
+                        <a href="tel:+18884961626" className="text-sm text-gray-600">(888) 496-1626</a>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Mail className="h-4 w-4" />
