@@ -283,8 +283,9 @@ const validateStreetAddress = (address: string) => {
   }
 
   // Check for common street address patterns
-  // Should contain numbers followed by letters/words
-  const streetPattern = /^\d+\s+[a-zA-Z\s\-.#]+$/
+  // Should start with a street number, then a street name that may itself
+  // contain digits (e.g. "215 W 14th St", "1 1st Ave", "42 42nd St").
+  const streetPattern = /^\d+\s+[a-zA-Z0-9\s\-.#,/]+$/
   return streetPattern.test(trimmedAddress)
 }
 
