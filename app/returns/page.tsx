@@ -902,7 +902,7 @@ export default function ReturnsPage() {
                     please contact our customer service team.
                   </p>
                   <p className="text-sm text-gray-500 font-medium">
-                    TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
+                    TCG Lore is an online trading card store operated by TOY HAULERZ LLC.
                   </p>
                 </div>
               </CardContent>

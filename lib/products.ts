@@ -1,10 +1,8 @@
 import "server-only"
 import { cache } from "react"
 import { getSql } from "./db-client"
-import type { Review } from "./reviews"
 import { profileDbQuery } from "./db-profiler"
 import { withDbRetry } from "./db-retry"
-import { generateRealisticSalesCount } from "./sales-generator"
 import { normalizePreorderFlag } from "./preorder"
 
 // ============================================================
@@ -210,11 +208,6 @@ function mapJoinedRowToProduct(row: DbProductJoined): Product {
   const realRating = dbRating > 0 ? Math.round(dbRating * 10) / 10 : undefined
   const realReviewCount = row.review_count ? parseInt(row.review_count, 10) : 0
 
-  // ─── Sales count (seeded) ─────────────────────────────────────────────────
-  const seededSalesCount = generateRealisticSalesCount(
-    row.id, price, categoryName, realRating || 5, isNew, isHot, false,
-  )
-
   // ─── Pre-order & release date ────────────────────────────────────────────
   // Read is_pre_order from DB when available (will be null if column is missing —
   // the try/catch in getPreOrderProducts guards that case at query time).
@@ -257,7 +250,6 @@ function mapJoinedRowToProduct(row: DbProductJoined): Product {
     isPreOrder,
     preOrderDate: isPreOrder ? "March 15, 2025" : undefined, // Stub
     releaseDate, // Formatted human-readable string (or undefined)
-    salesCount: seededSalesCount,
     description: row.description || undefined,
     stock: stockQuantity,
     rarity: row.rarity || undefined,

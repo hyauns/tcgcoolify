@@ -902,7 +902,7 @@ export default function ShippingPage() {
                   </Link>
                 </div>
                 <div className="pt-6 text-center text-sm text-gray-500 font-medium">
-                  TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
+                  TCG Lore is an online trading card store operated by TOY HAULERZ LLC.
                 </div>
               </CardContent>
             </Card>

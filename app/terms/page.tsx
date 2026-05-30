@@ -21,7 +21,7 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                Welcome to TCG Lore, an online trading card store operated by A Toy Haulerz LLC ("we," "our," "us," or "Company"). These Terms of Service
+                Welcome to TCG Lore, an online trading card store operated by TOY HAULERZ LLC ("we," "our," "us," or "Company"). These Terms of Service
                 ("Terms") govern your use of our website, mobile application, and services (collectively, the
                 "Service"). By accessing or using our Service, you agree to be bound by these Terms.
               </p>

@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   ].join(", "),
   authors: [{ name: "TCG Lore", url: siteUrl }],
   creator: "TCG Lore - Premium Trading Card Games",
-  publisher: "A Toy Haulerz LLC",
+  publisher: "TOY HAULERZ LLC",
   formatDetection: {
     email: false,
     address: false,
@@ -110,7 +110,7 @@ export default async function RootLayout({
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "A Toy Haulerz LLC",
+    "name": "TOY HAULERZ LLC",
     "alternateName": "TCG Lore",
     "url": siteUrl,
     "logo": `${siteUrl}/logo.png`,

@@ -52,17 +52,9 @@ import type { SiteSettings } from "@/lib/site-settings"
 // Types
 // ============================================================
 
-interface Review {
-  rating: number
-  reviewText: string
-  customerName: string
-  isVerified: boolean
-  productName: string
-}
-
 interface HomePageClientProps {
   heroSettings: SiteSettings
-  dataPromise: Promise<[Product[], Product[], Product[], Review[]]>
+  dataPromise: Promise<[Product[], Product[], Product[]]>
   trustpilotSlot?: React.ReactNode
 }
 
@@ -70,7 +62,7 @@ interface HomePageClientProps {
 // Client Component — all interactive behaviour lives here
 // ============================================================
 
-function HomeContent({ dataPromise, trustpilotSlot }: { dataPromise: Promise<[Product[], Product[], Product[], Review[]]>; trustpilotSlot?: React.ReactNode }) {
+function HomeContent({ dataPromise, trustpilotSlot }: { dataPromise: Promise<[Product[], Product[], Product[]]>; trustpilotSlot?: React.ReactNode }) {
   const [featuredProducts, bestSellingProducts, preOrderProducts] = use(dataPromise)
 
   const { addItemWithAnimation } = useCart()

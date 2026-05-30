@@ -191,7 +191,7 @@ export function PasswordResetTemplate({
               <a href="tel:+18884961626" style={{ color: "#dc3545", textDecoration: "none" }}>(888) 496-1626</a>
             </p>
             <p style={{ margin: "4px 0 0 0" }}>1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136</p>
-            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.</p>
+            <p style={{ margin: "8px 0 0 0" }}>© 2026 TCG Lore. Operated by TOY HAULERZ LLC. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -240,7 +240,7 @@ If you have any questions or concerns, please contact our support team at cs@tcg
 Best regards,
 The TCG Lore Security Team
 
-© 2026 TCG Lore. Operated by A Toy Haulerz LLC. All rights reserved.
+© 2026 TCG Lore. Operated by TOY HAULERZ LLC. All rights reserved.
 Support: cs@tcglore.com | Phone: (888) 496-1626
 1757 NORTH CENTRAL AVENUE, FLAGLER BEACH, FL 32136
   `.trim()

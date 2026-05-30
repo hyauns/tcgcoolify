@@ -381,7 +381,7 @@ export default function ContactFormContent() {
                   <div>
                     <h4 className="font-semibold">Business Office</h4>
                     <p className="text-sm text-gray-600">
-                      A Toy Haulerz LLC
+                      TOY HAULERZ LLC
                       <br />
                       1757 NORTH CENTRAL AVENUE
                       <br />

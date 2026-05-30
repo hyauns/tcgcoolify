@@ -65,7 +65,7 @@ export async function generateMetadata({
   const title = `${categoryName} TCG Cards | Authentic Cards & Boxes | TCG Lore`
   const description =
     categoryMeta?.description ??
-    `Shop authentic ${categoryName} trading cards, booster packs, and collectibles at TGC Lore. 100% genuine products, fast US shipping, and the best prices guaranteed.`
+    `Shop authentic ${categoryName} trading cards, booster packs, and collectibles at TCG Lore. 100% genuine products, fast US shipping, and the best prices guaranteed.`
 
   return {
     title,
@@ -111,8 +111,8 @@ function buildJsonLd(categoryName: string | null, productCount: number, canonica
       ? `${categoryName} TCG Cards | TCG Lore`
       : "All Trading Card Products | TCG Lore",
     description: categoryName
-      ? `Authentic ${categoryName} trading cards, booster packs, and collectibles at TGC Lore.`
-      : "Complete catalog of authentic trading cards and collectibles at TGC Lore.",
+      ? `Authentic ${categoryName} trading cards, booster packs, and collectibles at TCG Lore.`
+      : "Complete catalog of authentic trading cards and collectibles at TCG Lore.",
     url: canonicalUrl,
     provider: {
       "@type": "Organization",

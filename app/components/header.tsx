@@ -247,7 +247,7 @@ export function Header() {
                 priority
               />
               <p className="text-[10px] text-gray-500 hidden sm:block uppercase tracking-wider font-semibold">
-                Operated by A Toy Haulerz LLC
+                Operated by TOY HAULERZ LLC
               </p>
             </div>
           </Link>

@@ -39,7 +39,6 @@ import { generateSlug } from "@/lib/utils"
 import { getCategoryContent } from "@/lib/product-utils"
 import type { Product } from "@/lib/product-filters"
 import type { FilterAggregations } from "@/lib/product-filters"
-import { formatSalesCount } from "@/lib/sales-generator"
 
 interface ProductsPageClientProps {
   dataPromise: Promise<{

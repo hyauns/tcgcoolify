@@ -21,7 +21,7 @@ export function Footer() {
                 className="h-10 w-auto object-contain"
               />
               <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">
-                TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
+                TCG Lore is an online trading card store operated by TOY HAULERZ LLC.
               </span>
             </div>
             <p className="text-black text-sm leading-relaxed hover:text-[rgb(37,99,235)] transition-colors">
@@ -183,7 +183,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-black text-sm hover:text-[rgb(37,99,235)] transition-colors">
-            © {new Date().getFullYear()} TCG Lore. Operated by A Toy Haulerz LLC.
+            © {new Date().getFullYear()} TCG Lore. Operated by TOY HAULERZ LLC.
           </p>
 
           {/* Trading Card Game Copyright Information */}

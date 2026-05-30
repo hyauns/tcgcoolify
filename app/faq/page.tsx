@@ -165,7 +165,7 @@ const faqData: FAQCategory[] = [
       {
         question: "Who operates TCG Lore?",
         answer:
-          "TCG Lore is an online trading card store operated by A Toy Haulerz LLC, based in Flagler Beach, Florida. TCG Lore is not affiliated with, endorsed by, or officially sponsored by game publishers unless explicitly stated. Brand and publisher names are used solely to identify compatible products.",
+          "TCG Lore is an online trading card store operated by TOY HAULERZ LLC, based in Flagler Beach, Florida. TCG Lore is not affiliated with, endorsed by, or officially sponsored by game publishers unless explicitly stated. Brand and publisher names are used solely to identify compatible products.",
       },
     ],
   },
@@ -267,7 +267,7 @@ export default function FAQPage() {
                 </a>
               </div>
               <p className="mt-6 text-sm text-gray-500">
-                TCG Lore is operated by A Toy Haulerz LLC · cs@tcglore.com · (888) 496-1626
+                TCG Lore is operated by TOY HAULERZ LLC · cs@tcglore.com · (888) 496-1626
               </p>
             </CardContent>
           </Card>

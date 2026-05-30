@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   description:
     "Learn about TCG Lore's mission to provide trading card products. We serve collectors and players worldwide with clear product information and transparent fulfillment.",
   keywords:
-    "TCG Lore history, trading card store Miami, authentic TCG products, Magic Pokemon Yu-Gi-Oh store, collectible card games company",
+    "TCG Lore history, trading card store Florida, authentic TCG products, Magic Pokemon Yu-Gi-Oh store, collectible card games company",
   openGraph: {
     title: "About TCG Lore - Premium Trading Card Games Store",
-    description: "Learn about our mission to provide authentic trading cards and serve the TCG community since 2019.",
+    description: "Learn about our mission to provide authentic trading cards and serve the TCG community since 2025.",
     url: "https://tcglore.com/about",
   },
 }
@@ -103,7 +103,7 @@ export default function AboutPage() {
                       <Clock className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">The Beginning (2019)</h3>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">The Beginning (2025)</h3>
                       <p className="text-gray-600">
                         TCG Lore was created to make trading card shopping clearer for collectors and players. We focus on transparent product pages, visible availability, pre-order timing, support information, and policy details so customers can make informed purchase decisions.
                       </p>
@@ -115,7 +115,7 @@ export default function AboutPage() {
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Going Digital (2021)</h3>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Going Online</h3>
                       <p className="text-gray-600">
                         Recognizing the need to serve trading card collectors worldwide, we expanded online, bringing
                         our carefully curated selection of authentic TCG products and personal touch to customers across
@@ -249,7 +249,7 @@ export default function AboutPage() {
                     <Shield className="w-8 h-8 text-green-300 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2 text-white">Business Operator</h3>
                     <p className="text-green-200">
-                      A Toy Haulerz LLC
+                      TOY HAULERZ LLC
                     </p>
                   </CardContent>
                 </Card>

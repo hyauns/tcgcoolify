@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { getFeaturedProducts, getBestSellingProducts, getPreOrderProducts } from "@/lib/products"
-import { getAllReviews } from "@/lib/reviews"
 import { getSiteSettings } from "@/lib/site-settings"
 import HomePageClient from "./page-client"
 import { siteUrl } from "@/lib/site-config"
@@ -55,7 +54,6 @@ export default async function HomePage() {
     getFeaturedProducts(),
     getBestSellingProducts(),
     getPreOrderProducts(),
-    getAllReviews(),
   ])
 
   return (

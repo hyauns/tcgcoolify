@@ -126,15 +126,15 @@ const CATEGORY_CONTENT: Record<string, CategoryContent> = {
       "Find your spark! Shop authentic MTG booster boxes, bundles, and single cards from the latest releases to vintage classics.",
   },
   "pokemon-tcg": {
-    title: "Official Pokemon TCG - Packs & Elite Trainer Boxes",
+    title: "Pokemon TCG - Packs & Elite Trainer Boxes",
     description:
-      "Catch the best deals on authentic Pokemon cards. Explore the latest expansions, ETBs, and rare holographic cards at TGC Lore.",
+      "Catch the best deals on authentic Pokemon cards. Explore the latest expansions, ETBs, and rare holographic cards at TCG Lore.",
   },
   // Alias: DB slug may be "pokemon" instead of "pokemon-tcg"
   "pokemon": {
-    title: "Official Pokemon TCG - Packs & Elite Trainer Boxes",
+    title: "Pokemon TCG - Packs & Elite Trainer Boxes",
     description:
-      "Catch the best deals on authentic Pokemon cards. Explore the latest expansions, ETBs, and rare holographic cards at TGC Lore.",
+      "Catch the best deals on authentic Pokemon cards. Explore the latest expansions, ETBs, and rare holographic cards at TCG Lore.",
   },
   "yu-gi-oh": {
     title: "Yu-Gi-Oh! TCG - Booster Boxes & Structure Decks",

@@ -9,7 +9,7 @@ import { siteUrl } from "@/lib/site-config"
 export const metadata: Metadata = {
   title: "Authenticity & Trust | TCG Lore",
   description:
-    "How TCG Lore, operated by A Toy Haulerz LLC, sources, inspects, and ships trading card products. Our authenticity, sourcing, and quality-check process.",
+    "How TCG Lore, operated by TOY HAULERZ LLC, sources, inspects, and ships trading card products. Our authenticity, sourcing, and quality-check process.",
   alternates: {
     canonical: `${siteUrl}/authenticity`,
   },
@@ -31,7 +31,7 @@ export default function AuthenticityPage() {
               Authenticity &amp; Trust
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              How TCG Lore, operated by A Toy Haulerz LLC, sources, inspects, and ships the trading card products in our catalog.
+              How TCG Lore, operated by TOY HAULERZ LLC, sources, inspects, and ships the trading card products in our catalog.
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export default function AuthenticityPage() {
                 </a>
               </div>
               <p className="text-sm text-gray-500 pt-4">
-                TCG Lore is an online trading card store operated by A Toy Haulerz LLC.
+                TCG Lore is an online trading card store operated by TOY HAULERZ LLC.
               </p>
             </CardContent>
           </Card>
