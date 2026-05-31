@@ -69,23 +69,46 @@ function CheckoutSuccessContent() {
   // Fire the Google Ads purchase conversion once, after the order is confirmed.
   // Reads orderData only — does not touch the polling/payment flow above.
   // The conversion ID/label are exposed on window by the global gtag tag in app/layout.tsx.
+  // gtag loads "afterInteractive", so it may not be ready the instant the order
+  // confirms — retry every 500ms (up to ~10s) until it is, so the event is never lost.
   useEffect(() => {
     if (conversionFiredRef.current) return
     if (!orderData?.success || !orderData.order) return
     if (typeof window === "undefined") return
 
-    const w = window as any
-    const conversionId: string | undefined = w.__googleAdsConversionId
-    const conversionLabel: string | undefined = w.__googleAdsConversionLabel
-    if (typeof w.gtag !== "function" || !conversionId || !conversionLabel) return
+    let attempts = 0
+    let timer: ReturnType<typeof setTimeout> | null = null
 
-    conversionFiredRef.current = true
-    w.gtag("event", "conversion", {
-      send_to: `${conversionId}/${conversionLabel}`,
-      value: orderData.order.total,
-      currency: "USD",
-      transaction_id: orderData.order.orderNumber,
-    })
+    const tryFire = () => {
+      if (conversionFiredRef.current) return
+
+      const w = window as any
+      const conversionId: string | undefined = w.__googleAdsConversionId
+      const conversionLabel: string | undefined = w.__googleAdsConversionLabel
+
+      if (typeof w.gtag === "function" && conversionId && conversionLabel) {
+        conversionFiredRef.current = true
+        w.gtag("event", "conversion", {
+          send_to: `${conversionId}/${conversionLabel}`,
+          value: orderData.order.total,
+          currency: "USD",
+          transaction_id: orderData.order.orderNumber,
+        })
+        return
+      }
+
+      // gtag tag not ready yet (or tracking not configured) — retry briefly.
+      attempts++
+      if (attempts <= 20) {
+        timer = setTimeout(tryFire, 500)
+      }
+    }
+
+    tryFire()
+
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
   }, [orderData])
 
   useEffect(() => {
