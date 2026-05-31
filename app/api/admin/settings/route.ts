@@ -29,6 +29,18 @@ const googleVerificationToken = z
   .nullish()
   .transform((v) => (v === '' || v == null ? null : v));
 
+// Google Ads Conversion ID — format "AW-" followed by digits (e.g. AW-123456789).
+const googleAdsConversionId = z
+  .union([z.string().regex(/^AW-\d{6,15}$/), z.literal(''), z.null()])
+  .nullish()
+  .transform((v) => (v === '' || v == null ? null : v));
+
+// Google Ads Conversion Label — the alphanumeric/_/- token from the event snippet.
+const googleAdsConversionLabel = z
+  .union([z.string().regex(/^[A-Za-z0-9_-]+$/).max(128), z.literal(''), z.null()])
+  .nullish()
+  .transform((v) => (v === '' || v == null ? null : v));
+
 const settingsSchema = z.object({
   heroTitle: optionalText(200),
   heroSubtitle: optionalText(500),
@@ -39,6 +51,8 @@ const settingsSchema = z.object({
   seoDescription: optionalText(500),
   seoKeywords: optionalText(500),
   googleSiteVerification: googleVerificationToken,
+  googleAdsConversionId: googleAdsConversionId,
+  googleAdsConversionLabel: googleAdsConversionLabel,
   socialFacebook: optionalUrl,
   socialInstagram: optionalUrl,
   socialPinterest: optionalUrl,
@@ -64,6 +78,8 @@ export async function GET() {
         seo_description: null,
         seo_keywords: null,
         google_site_verification: null,
+        google_ads_conversion_id: null,
+        google_ads_conversion_label: null,
         social_facebook: null,
         social_instagram: null,
         social_pinterest: null,
@@ -84,6 +100,8 @@ export async function GET() {
       seoDescription: settings.seo_description,
       seoKeywords: settings.seo_keywords,
       googleSiteVerification: settings.google_site_verification,
+      googleAdsConversionId: settings.google_ads_conversion_id,
+      googleAdsConversionLabel: settings.google_ads_conversion_label,
       socialFacebook: settings.social_facebook,
       socialInstagram: settings.social_instagram,
       socialPinterest: settings.social_pinterest,
@@ -120,10 +138,10 @@ export async function PUT(request: Request) {
     // Perform Upsert on Neon using raw SQL
     const updatedSettings = await sql`
       INSERT INTO site_settings (
-        id, hero_title, hero_subtitle, hero_image_url, logo_url, favicon_url, seo_title, seo_description, seo_keywords, google_site_verification, social_facebook, social_instagram, social_pinterest, social_twitter, social_youtube
+        id, hero_title, hero_subtitle, hero_image_url, logo_url, favicon_url, seo_title, seo_description, seo_keywords, google_site_verification, google_ads_conversion_id, google_ads_conversion_label, social_facebook, social_instagram, social_pinterest, social_twitter, social_youtube
       )
       VALUES (
-        1, ${heroTitle}, ${heroSubtitle}, ${body.heroImageUrl || null}, ${body.logoUrl || null}, ${body.faviconUrl || null}, ${body.seoTitle || null}, ${body.seoDescription || null}, ${body.seoKeywords || null}, ${body.googleSiteVerification || null}, ${body.socialFacebook || null}, ${body.socialInstagram || null}, ${body.socialPinterest || null}, ${body.socialTwitter || null}, ${body.socialYoutube || null}
+        1, ${heroTitle}, ${heroSubtitle}, ${body.heroImageUrl || null}, ${body.logoUrl || null}, ${body.faviconUrl || null}, ${body.seoTitle || null}, ${body.seoDescription || null}, ${body.seoKeywords || null}, ${body.googleSiteVerification || null}, ${body.googleAdsConversionId || null}, ${body.googleAdsConversionLabel || null}, ${body.socialFacebook || null}, ${body.socialInstagram || null}, ${body.socialPinterest || null}, ${body.socialTwitter || null}, ${body.socialYoutube || null}
       )
       ON CONFLICT (id) DO UPDATE SET
         hero_title = EXCLUDED.hero_title,
@@ -135,6 +153,8 @@ export async function PUT(request: Request) {
         seo_description = EXCLUDED.seo_description,
         seo_keywords = EXCLUDED.seo_keywords,
         google_site_verification = EXCLUDED.google_site_verification,
+        google_ads_conversion_id = EXCLUDED.google_ads_conversion_id,
+        google_ads_conversion_label = EXCLUDED.google_ads_conversion_label,
         social_facebook = EXCLUDED.social_facebook,
         social_instagram = EXCLUDED.social_instagram,
         social_pinterest = EXCLUDED.social_pinterest,
@@ -161,6 +181,8 @@ export async function PUT(request: Request) {
       seoDescription: settings.seo_description,
       seoKeywords: settings.seo_keywords,
       googleSiteVerification: settings.google_site_verification,
+      googleAdsConversionId: settings.google_ads_conversion_id,
+      googleAdsConversionLabel: settings.google_ads_conversion_label,
       socialFacebook: settings.social_facebook,
       socialInstagram: settings.social_instagram,
       socialPinterest: settings.social_pinterest,

@@ -11,6 +11,8 @@ export interface SiteSettings {
   seoDescription: string | null
   seoKeywords: string | null
   googleSiteVerification: string | null
+  googleAdsConversionId: string | null
+  googleAdsConversionLabel: string | null
   socialFacebook: string | null
   socialInstagram: string | null
   socialPinterest: string | null
@@ -29,6 +31,8 @@ const DEFAULTS: SiteSettings = {
   seoDescription: null,
   seoKeywords: null,
   googleSiteVerification: null,
+  googleAdsConversionId: null,
+  googleAdsConversionLabel: null,
   socialFacebook: null,
   socialInstagram: null,
   socialPinterest: null,
@@ -59,6 +63,8 @@ async function fetchSettingsOnce(): Promise<SiteSettings> {
     seoDescription: row.seo_description || null,
     seoKeywords: row.seo_keywords || null,
     googleSiteVerification: row.google_site_verification || null,
+    googleAdsConversionId: row.google_ads_conversion_id || null,
+    googleAdsConversionLabel: row.google_ads_conversion_label || null,
     socialFacebook: row.social_facebook || null,
     socialInstagram: row.social_instagram || null,
     socialPinterest: row.social_pinterest || null,

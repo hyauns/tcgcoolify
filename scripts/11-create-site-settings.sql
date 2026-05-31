@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS site_settings (
     seo_description TEXT,
     seo_keywords TEXT,
     google_site_verification VARCHAR(255),
+    google_ads_conversion_id VARCHAR(32),
+    google_ads_conversion_label VARCHAR(128),
     social_facebook VARCHAR(255),
     social_instagram VARCHAR(255),
     social_pinterest VARCHAR(255),

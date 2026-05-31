@@ -23,7 +23,7 @@ import Link from "next/link"
 import { Header } from "../../components/header"
 import { Footer } from "../../components/footer"
 import { useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 
 type OrderSuccessPayload = {
   success: boolean
@@ -64,6 +64,29 @@ function CheckoutSuccessContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
+  const conversionFiredRef = useRef(false)
+
+  // Fire the Google Ads purchase conversion once, after the order is confirmed.
+  // Reads orderData only — does not touch the polling/payment flow above.
+  // The conversion ID/label are exposed on window by the global gtag tag in app/layout.tsx.
+  useEffect(() => {
+    if (conversionFiredRef.current) return
+    if (!orderData?.success || !orderData.order) return
+    if (typeof window === "undefined") return
+
+    const w = window as any
+    const conversionId: string | undefined = w.__googleAdsConversionId
+    const conversionLabel: string | undefined = w.__googleAdsConversionLabel
+    if (typeof w.gtag !== "function" || !conversionId || !conversionLabel) return
+
+    conversionFiredRef.current = true
+    w.gtag("event", "conversion", {
+      send_to: `${conversionId}/${conversionLabel}`,
+      value: orderData.order.total,
+      currency: "USD",
+      transaction_id: orderData.order.orderNumber,
+    })
+  }, [orderData])
 
   useEffect(() => {
     let isMounted = true

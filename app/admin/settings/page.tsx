@@ -32,6 +32,8 @@ export default function SettingsPage() {
     seoDescription: "",
     seoKeywords: "",
     googleSiteVerification: "",
+    googleAdsConversionId: "",
+    googleAdsConversionLabel: "",
     socialFacebook: "",
     socialInstagram: "",
     socialPinterest: "",
@@ -69,6 +71,8 @@ export default function SettingsPage() {
           seoDescription: data.seoDescription || "",
           seoKeywords: data.seoKeywords || "",
           googleSiteVerification: data.googleSiteVerification || "",
+          googleAdsConversionId: data.googleAdsConversionId || "",
+          googleAdsConversionLabel: data.googleAdsConversionLabel || "",
           socialFacebook: data.socialFacebook || "",
           socialInstagram: data.socialInstagram || "",
           socialPinterest: data.socialPinterest || "",
@@ -148,6 +152,8 @@ export default function SettingsPage() {
         seoDescription: savedData.seoDescription || "",
         seoKeywords: savedData.seoKeywords || "",
         googleSiteVerification: savedData.googleSiteVerification || "",
+        googleAdsConversionId: savedData.googleAdsConversionId || "",
+        googleAdsConversionLabel: savedData.googleAdsConversionLabel || "",
         socialFacebook: savedData.socialFacebook || "",
         socialInstagram: savedData.socialInstagram || "",
         socialPinterest: savedData.socialPinterest || "",
@@ -250,8 +256,8 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value={Tab.SEO} className="pt-2">
-          <SEOSettings 
-            data={{ seoTitle: formData.seoTitle, seoDescription: formData.seoDescription, seoKeywords: formData.seoKeywords, googleSiteVerification: formData.googleSiteVerification }}
+          <SEOSettings
+            data={{ seoTitle: formData.seoTitle, seoDescription: formData.seoDescription, seoKeywords: formData.seoKeywords, googleSiteVerification: formData.googleSiteVerification, googleAdsConversionId: formData.googleAdsConversionId, googleAdsConversionLabel: formData.googleAdsConversionLabel }}
             onChange={handleChange}
           />
         </TabsContent>

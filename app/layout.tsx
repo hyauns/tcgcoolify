@@ -96,8 +96,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const settings = await getSiteSettings()
   let categories: { name: string, slug: string }[] = []
-  
+
   if (process.env.DATABASE_URL) {
     try {
       const sql = getSql()
@@ -157,6 +158,25 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        {settings.googleAdsConversionId && (
+          <>
+            <Script
+              id="google-ads-gtag-src"
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${settings.googleAdsConversionId}`}
+            />
+            <Script id="google-ads-gtag-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${settings.googleAdsConversionId}');
+                window.__googleAdsConversionId = '${settings.googleAdsConversionId}';
+                ${settings.googleAdsConversionLabel ? `window.__googleAdsConversionLabel = '${settings.googleAdsConversionLabel}';` : ""}
+              `}
+            </Script>
+          </>
+        )}
         <Providers categories={categories}>
           {children}
           <Suspense fallback={null}>
