@@ -10,11 +10,11 @@ const isProd = process.env.NODE_ENV === "production"
 const SECURITY_HEADERS = {
   "Content-Security-Policy": [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' ${!isProd ? "'unsafe-eval'" : ""} https://maps.googleapis.com https://challenges.cloudflare.com https://va.vercel-scripts.com https://widget.trustpilot.com https://www.googletagmanager.com`,
+    `script-src 'self' 'unsafe-inline' ${!isProd ? "'unsafe-eval'" : ""} https://maps.googleapis.com https://challenges.cloudflare.com https://va.vercel-scripts.com https://widget.trustpilot.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' https://maps.googleapis.com https://challenges.cloudflare.com https://*.trustpilot.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net",
+    "connect-src 'self' https://maps.googleapis.com https://challenges.cloudflare.com https://*.trustpilot.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://*.g.doubleclick.net",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://*.trustpilot.com",
     "frame-ancestors 'none'",
     "form-action 'self'",
