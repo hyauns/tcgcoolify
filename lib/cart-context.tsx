@@ -176,13 +176,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [showAddToCartPopup, setShowAddToCartPopup] = useState(false)
   const [addToCartPopupProduct, setAddToCartPopupProduct] = useState<CartContextType["addToCartPopupProduct"]>(null)
 
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   const prevAuthRef = useRef<boolean>(false)
   const didLoadRef = useRef<boolean>(false)
+  // Becomes true only after the initial cart load (DB or localStorage) finishes.
+  // Guards the persist effect so the empty initial state can never overwrite a
+  // saved guest cart before it has been read back in.
+  const [hydrated, setHydrated] = useState(false)
 
   // --- Boot: load cart from DB (auth) or localStorage (guest) ------------
+  // Wait for the auth session check to settle (authLoading === false) before
+  // deciding which source to read. Running while auth is still loading would
+  // treat a logged-in user as a guest, set didLoadRef, and then skip the DB
+  // load once auth resolves — leaving the cart empty on refresh.
   useEffect(() => {
     if (didLoadRef.current) return
+    if (authLoading) return
 
     if (isAuthenticated) {
       didLoadRef.current = true
@@ -195,6 +204,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
         })
         .catch(() => {})
+        .finally(() => setHydrated(true))
     } else {
       // Guest: load from localStorage
       try {
@@ -203,10 +213,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const parsed: CartItem[] = JSON.parse(saved)
           dispatch({ type: "LOAD_CART", payload: parsed })
         }
-        didLoadRef.current = true
       } catch { /* ignore */ }
+      didLoadRef.current = true
+      setHydrated(true)
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, authLoading])
 
   // --- On login: merge guest localStorage cart into DB -------------------
   useEffect(() => {
@@ -238,13 +249,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated])
 
   // --- Guest: persist to localStorage ------------------------------------
+  // Only after hydration — otherwise the empty initial state would clobber the
+  // saved cart on the first render (before the boot effect reads it back).
   useEffect(() => {
+    if (!hydrated) return
     if (!isAuthenticated) {
       try {
         localStorage.setItem("cart", JSON.stringify(state.items))
       } catch { /* ignore */ }
     }
-  }, [state.items, isAuthenticated])
+  }, [state.items, isAuthenticated, hydrated])
 
   // --- Wrapped dispatch that also syncs to DB when authenticated ----------
   const syncedDispatch: React.Dispatch<CartAction> = (action) => {
