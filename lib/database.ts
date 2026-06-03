@@ -148,7 +148,10 @@ export const adminDb = {
 
   async getOrders(page = 1, limit = 10, search?: string, status?: string): Promise<{ orders: Order[]; total: number }> {
     const connection = getSqlConnection()
-    const searchParam = search ? `%${search}%` : null;
+    // Normalise the search term: trim whitespace and drop a leading "#" so a
+    // pasted "#ORD-..." matches the stored order_number (which has no "#").
+    const cleanedSearch = search?.trim().replace(/^#/, "") || null;
+    const searchParam = cleanedSearch ? `%${cleanedSearch}%` : null;
     const statusParam = status || null;
     const offset = (page - 1) * limit;
 
@@ -160,7 +163,7 @@ export const adminDb = {
       SELECT COUNT(*) as total
       FROM orders o
       LEFT JOIN customers c ON c.id::text = o.customer_id::text
-      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam})
+      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam} OR (c.first_name || ' ' || COALESCE(c.last_name, '')) ILIKE ${searchParam})
         AND (${statusParam}::text IS NULL OR o.status = ${statusParam})
     `;
     const total = Number(countResult[0]?.total || 0);
@@ -172,7 +175,7 @@ export const adminDb = {
         c.email as customer_email
       FROM orders o
       LEFT JOIN customers c ON c.id::text = o.customer_id::text
-      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam})
+      WHERE (${searchParam}::text IS NULL OR o.order_number ILIKE ${searchParam} OR c.email ILIKE ${searchParam} OR c.first_name ILIKE ${searchParam} OR c.last_name ILIKE ${searchParam} OR (c.first_name || ' ' || COALESCE(c.last_name, '')) ILIKE ${searchParam})
         AND (${statusParam}::text IS NULL OR o.status = ${statusParam})
       ORDER BY o.created_at DESC
       LIMIT ${limit} OFFSET ${offset}

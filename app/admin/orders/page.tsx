@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -31,6 +32,11 @@ export default function OrdersPage() {
   const [showOrderDetail, setShowOrderDetail] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  // Bulk selection (scoped to the orders currently shown on this page)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkStatus, setBulkStatus] = useState("")
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false)
+  const [bulkProcessing, setBulkProcessing] = useState(false)
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -48,6 +54,8 @@ export default function OrdersPage() {
       if (data.orders && Array.isArray(data.orders)) {
         setOrders(data.orders)
         setTotalPages(Math.ceil((data.total || 0) / 10))
+        // Selection is page-scoped — clear it whenever the visible rows change.
+        setSelectedIds(new Set())
       } else {
         console.error("Invalid orders data received:", data)
         setOrders([])
@@ -92,6 +100,60 @@ export default function OrdersPage() {
       }
     } catch (error) {
       console.error("Error updating order status:", error)
+    }
+  }
+
+  // Reset to page 1 whenever the search term or status filter changes, otherwise
+  // a stale high page number makes a small result set fall past the OFFSET and
+  // show nothing.
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setCurrentPage(1)
+  }
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value)
+    setCurrentPage(1)
+  }
+
+  const allOnPageSelected = orders.length > 0 && orders.every((o) => selectedIds.has(o.id))
+
+  const toggleSelectAll = (checked: boolean) => {
+    setSelectedIds(checked ? new Set(orders.map((o) => o.id)) : new Set())
+  }
+
+  const toggleSelectOne = (orderId: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(orderId)
+      else next.delete(orderId)
+      return next
+    })
+  }
+
+  const handleBulkApply = async () => {
+    if (selectedIds.size === 0 || !bulkStatus) return
+    setBulkProcessing(true)
+    try {
+      const response = await fetch("/api/admin/orders/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds), status: bulkStatus }),
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        alert(result.error || "Bulk update failed")
+      } else if (result.failed && result.failed.length > 0) {
+        alert(`Updated ${result.updated} order(s). ${result.failed.length} failed.`)
+      }
+      setBulkStatus("")
+      await fetchOrders()
+    } catch (error) {
+      console.error("Error applying bulk update:", error)
+      alert("Bulk update failed")
+    } finally {
+      setBulkProcessing(false)
+      setShowBulkConfirm(false)
     }
   }
 
@@ -160,11 +222,11 @@ export default function OrdersPage() {
               <Input
                 placeholder="Search by order ID, customer name, or email..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -190,10 +252,49 @@ export default function OrdersPage() {
             </div>
           ) : (
             <>
+              {/* Bulk action bar — shown when one or more orders on this page are selected */}
+              {selectedIds.size > 0 && (
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border">
+                  <span className="text-sm font-medium">
+                    {selectedIds.size} selected on this page
+                  </span>
+                  <div className="flex items-center gap-2 sm:ml-auto">
+                    <Select value={bulkStatus} onValueChange={setBulkStatus}>
+                      <SelectTrigger className="w-44">
+                        <SelectValue placeholder="Set status to..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="PROCESSING">Processing</SelectItem>
+                        <SelectItem value="SHIPPED">Shipped</SelectItem>
+                        <SelectItem value="DELIVERED">Delivered</SelectItem>
+                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      disabled={!bulkStatus}
+                      onClick={() => setShowBulkConfirm(true)}
+                    >
+                      Apply
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox
+                          checked={allOnPageSelected}
+                          onCheckedChange={(c) => toggleSelectAll(c === true)}
+                          aria-label="Select all orders on this page"
+                        />
+                      </TableHead>
                       <TableHead>Order ID</TableHead>
                       <TableHead>Customer</TableHead>
                       <TableHead>Total</TableHead>
@@ -205,7 +306,14 @@ export default function OrdersPage() {
                   <TableBody>
                     {orders && orders.length > 0 ? (
                       orders.map((order) => (
-                        <TableRow key={order.id}>
+                        <TableRow key={order.id} data-state={selectedIds.has(order.id) ? "selected" : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.has(order.id)}
+                              onCheckedChange={(c) => toggleSelectOne(order.id, c === true)}
+                              aria-label={`Select order ${order.order_number || order.id}`}
+                            />
+                          </TableCell>
                           <TableCell className="font-mono">#{order.order_number || String(order.id).slice(-8)}</TableCell>
                           <TableCell>
                             <div>
@@ -227,7 +335,7 @@ export default function OrdersPage() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                        <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                           {loading ? "Loading orders..." : "No orders found. Database tables may need to be set up."}
                         </TableCell>
                       </TableRow>
@@ -349,6 +457,39 @@ export default function OrdersPage() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk action confirmation */}
+      <Dialog open={showBulkConfirm} onOpenChange={(open) => !bulkProcessing && setShowBulkConfirm(open)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm bulk update</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm">
+              Set <strong>{selectedIds.size}</strong> order(s) to{" "}
+              <Badge className={getStatusColor(bulkStatus)}>{bulkStatus || "—"}</Badge>?
+            </p>
+            {bulkStatus === "CANCELLED" && (
+              <p className="text-sm text-red-600 dark:text-red-400">
+                ⚠️ This will cancel {selectedIds.size} order(s) and email a cancellation
+                notice to each customer that has an email on file. This cannot be undone.
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkConfirm(false)}
+                disabled={bulkProcessing}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleBulkApply} disabled={bulkProcessing}>
+                {bulkProcessing ? "Applying..." : "Confirm"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
