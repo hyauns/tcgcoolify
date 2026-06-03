@@ -3,7 +3,6 @@ import { getFeaturedProducts, getBestSellingProducts, getPreOrderProducts } from
 import { getSiteSettings } from "@/lib/site-settings"
 import HomePageClient from "./page-client"
 import { siteUrl } from "@/lib/site-config"
-import { TrustpilotRating } from "./components/trustpilot-rating"
 
 // ============================================================
 // SEO Metadata
@@ -60,7 +59,6 @@ export default async function HomePage() {
     <HomePageClient
       heroSettings={siteSettings}
       dataPromise={dataPromise}
-      trustpilotSlot={<TrustpilotRating />}
     />
   )
 }

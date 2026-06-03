@@ -55,14 +55,13 @@ import type { SiteSettings } from "@/lib/site-settings"
 interface HomePageClientProps {
   heroSettings: SiteSettings
   dataPromise: Promise<[Product[], Product[], Product[]]>
-  trustpilotSlot?: React.ReactNode
 }
 
 // ============================================================
 // Client Component — all interactive behaviour lives here
 // ============================================================
 
-function HomeContent({ dataPromise, trustpilotSlot }: { dataPromise: Promise<[Product[], Product[], Product[]]>; trustpilotSlot?: React.ReactNode }) {
+function HomeContent({ dataPromise }: { dataPromise: Promise<[Product[], Product[], Product[]]> }) {
   const [featuredProducts, bestSellingProducts, preOrderProducts] = use(dataPromise)
 
   const { addItemWithAnimation } = useCart()
@@ -709,10 +708,6 @@ function HomeContent({ dataPromise, trustpilotSlot }: { dataPromise: Promise<[Pr
               </CardContent>
             </Card>
           </div>
-
-          {/* Custom-branded reviews badge — see app/components/trustpilot-rating.tsx.
-              Fetched server-side from the public Trustpilot page (no paid sub). */}
-          {trustpilotSlot && <div className="flex justify-center mt-6">{trustpilotSlot}</div>}
         </div>
       </section>
 
@@ -749,7 +744,7 @@ function HomeFallback() {
   )
 }
 
-export default function HomePageClient({ heroSettings, dataPromise, trustpilotSlot }: HomePageClientProps) {
+export default function HomePageClient({ heroSettings, dataPromise }: HomePageClientProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -759,7 +754,7 @@ export default function HomePageClient({ heroSettings, dataPromise, trustpilotSl
         heroImageUrl={heroSettings.heroImageUrl}
       />
       <Suspense fallback={<HomeFallback />}>
-        <HomeContent dataPromise={dataPromise} trustpilotSlot={trustpilotSlot} />
+        <HomeContent dataPromise={dataPromise} />
       </Suspense>
       <Footer />
     </div>
