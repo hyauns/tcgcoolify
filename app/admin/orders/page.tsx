@@ -65,7 +65,7 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchOrders()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, statusFilter])
+  }, [search, statusFilter, currentPage])
 
   const handleViewOrder = async (orderId: string) => {
     try {
