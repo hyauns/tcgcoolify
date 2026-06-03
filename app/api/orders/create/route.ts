@@ -372,7 +372,11 @@ export async function POST(request: NextRequest) {
       t1 = performance.now()
 
       const transactionId = `txn_${Date.now()}_${globalThis.crypto.randomUUID().slice(0, 8)}`
-      if (paymentMethodId) {
+      // Always create the transaction row so /api/checkout/process and the
+      // gateway webhook can find it. Card orders link a payment_methods row;
+      // cardless orders (Stripe redirect — card collected by Stripe) leave
+      // payment_method_id NULL (see migration 17).
+      {
         const txCustomerId = customerId ?? "guest"
         const gatewayResponse = JSON.stringify({ source: "checkout" })
         await sql`
@@ -380,7 +384,7 @@ export async function POST(request: NextRequest) {
             customer_id, payment_method_id, order_id,
             transaction_id, amount, currency,
             status, risk_score, gateway_response
-          ) VALUES (${txCustomerId}, ${paymentMethodId}, ${String(order.id)}, ${transactionId}, ${formattedTotalAmount}, 'USD', 'pending', 0, ${gatewayResponse})
+          ) VALUES (${txCustomerId}, ${paymentMethodId ?? null}, ${String(order.id)}, ${transactionId}, ${formattedTotalAmount}, 'USD', 'pending', 0, ${gatewayResponse})
         `
       }
 

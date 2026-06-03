@@ -411,6 +411,26 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [calculatedTax, setCalculatedTax] = useState<number | null>(null)
   const [isCalculatingTax, setIsCalculatingTax] = useState(false)
+  const [gatewayFlow, setGatewayFlow] = useState<"mock_charge" | "stripe">("mock_charge")
+
+  // Resolve the active gateway flow (mock_charge | stripe). When Stripe is
+  // active we switch the payment method off "card" so the card form + card
+  // validation are skipped (Stripe collects the card on its hosted page).
+  useEffect(() => {
+    let cancelled = false
+    fetch("/api/checkout/payment-mode")
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return
+        const flow = d?.flow === "stripe" ? "stripe" : "mock_charge"
+        setGatewayFlow(flow)
+        setFormData((prev) => ({ ...prev, paymentMethod: flow === "stripe" ? "stripe" : "card" }))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Mobile detection and keyboard handling
   const checkMobile = () => {
@@ -722,14 +742,23 @@ export default function CheckoutPage() {
     },
   ]
 
-  const paymentMethods = [
-    {
-      id: "card",
-      name: "Credit/Debit Card",
-      description: "Pay with your card",
-      icon: CreditCard,
-    },
-  ]
+  const paymentMethods = gatewayFlow === "stripe"
+    ? [
+        {
+          id: "stripe",
+          name: "Credit/Debit Card",
+          description: "You'll be securely redirected to complete payment",
+          icon: CreditCard,
+        },
+      ]
+    : [
+        {
+          id: "card",
+          name: "Credit/Debit Card",
+          description: "Pay with your card",
+          icon: CreditCard,
+        },
+      ]
 
   // Calculate totals - ensure this recalculates when formData.shippingMethod changes
   const subtotal = state.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0
@@ -1147,6 +1176,7 @@ export default function CheckoutPage() {
           transactionId: orderResult?.order?.transactionId || `txn_${Date.now()}`,
           amount: totalAmount,
           customerName: `${formData.firstName} ${formData.lastName}`,
+          customerEmail: userEmail,
           paymentInfo: formData.cardNumber ? {
             cardNumber: formData.cardNumber,
             expiryDate: formData.expiryDate,
@@ -1175,9 +1205,18 @@ export default function CheckoutPage() {
         throw new Error("Payment processing failed at Gateway.")
       }
 
-      setPaymentStage(4)
+      const processResult = await processResponse.json().catch(() => ({}))
 
-      // Order is confirmed in the database & gateway accepted the charge.
+      // Stripe flow: the gateway returns a redirect URL to its hosted checkout.
+      // The order stays PENDING until the gateway webhook confirms payment.
+      if (processResult?.redirectUrl) {
+        setPaymentStage(4)
+        window.location.href = processResult.redirectUrl
+        return
+      }
+
+      // Mock-charge flow (unchanged): order already confirmed synchronously.
+      setPaymentStage(4)
       await new Promise((resolve) => setTimeout(resolve, 1500))
       window.location.href = `/checkout/success?orderNumber=${orderNumber}`
     } catch (error) {
@@ -1240,6 +1279,41 @@ export default function CheckoutPage() {
                   >
                     Try Again
                   </Button>
+                </div>
+              </div>
+            ) : gatewayFlow === "stripe" ? (
+              // Stripe redirect state — buyer is about to be sent to the secure hosted page.
+              // (Distinct from the mock-charge stages, which describe a direct card charge.)
+              <div className="space-y-5 sm:space-y-6">
+                <div className="relative">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-full flex items-center justify-center mx-auto">
+                    <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-600" />
+                  </div>
+                  <div className="absolute inset-0 rounded-full">
+                    <div className="absolute inset-2 rounded-full border-4 border-gray-200">
+                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-600 animate-spin" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Redirecting to secure checkout</h3>
+                  <p className="text-sm sm:text-base text-gray-600">
+                    You&apos;ll complete your payment on a secure page. Please keep this window open &mdash; you&apos;ll
+                    return here automatically once payment is confirmed.
+                  </p>
+                </div>
+                <div className="flex justify-center gap-1.5">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce"
+                      style={{ animationDelay: `${i * 0.15}s` }}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Secured &amp; encrypted payment</span>
                 </div>
               </div>
             ) : paymentStage === 4 ? (
@@ -1971,6 +2045,20 @@ export default function CheckoutPage() {
                 })}
               </RadioGroup>
             </div>
+
+            {/* Stripe — no card collected here; buyer is redirected to Stripe */}
+            {formData.paymentMethod === "stripe" && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 flex items-start gap-3">
+                <CreditCard className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-blue-800">
+                  <p className="font-semibold">Secure payment via Stripe</p>
+                  <p className="mt-0.5 text-blue-700">
+                    After placing your order you'll be redirected to a secure Stripe page to enter your card details.
+                    Your order is confirmed once payment completes.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Card Details - Show for card payment method */}
             {formData.paymentMethod === "card" && (

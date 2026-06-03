@@ -51,59 +51,88 @@ export async function togglePaymentGateway(enabled: boolean) {
   return { success: true, enabled }
 }
 
+/**
+ * Resolves the active payment flow for this storefront.
+ *   'mock_charge' (default) — direct card charge via /api/gateway/mock-charge
+ *   'stripe'                 — Stripe Checkout redirect via /api/gateway/checkout
+ * Stored in store_settings under GATEWAY_FLOW so admins can switch without code.
+ */
+export type GatewayFlow = "mock_charge" | "stripe"
+
+export async function getGatewayFlow(): Promise<GatewayFlow> {
+  const sql = getSqlConnection()
+  const result = await sql`SELECT value FROM store_settings WHERE key = 'GATEWAY_FLOW'`
+  return result[0]?.value === "stripe" ? "stripe" : "mock_charge"
+}
+
 export async function getGatewayProviderSettings() {
   const sql = getSqlConnection()
-  const result = await sql`SELECT key, value FROM store_settings WHERE key IN ('GATEWAY_BASE_URL', 'GATEWAY_STORE_ID', 'GATEWAY_API_KEY', 'GATEWAY_WEBHOOK_SECRET')`
-  
+  const result = await sql`SELECT key, value FROM store_settings WHERE key IN ('GATEWAY_BASE_URL', 'GATEWAY_STORE_ID', 'GATEWAY_API_KEY', 'GATEWAY_WEBHOOK_SECRET', 'GATEWAY_FLOW')`
+
   const settings = {
     baseUrl: "",
     storeId: "",
     apiKey: "",
-    webhookSecret: ""
+    webhookSecret: "",
+    flow: "mock_charge" as GatewayFlow
   }
-  
+
   result.forEach((row: any) => {
     if (row.key === "GATEWAY_BASE_URL") settings.baseUrl = row.value
     if (row.key === "GATEWAY_STORE_ID") settings.storeId = row.value
     if (row.key === "GATEWAY_API_KEY") settings.apiKey = row.value
     if (row.key === "GATEWAY_WEBHOOK_SECRET") settings.webhookSecret = row.value
+    if (row.key === "GATEWAY_FLOW") settings.flow = row.value === "stripe" ? "stripe" : "mock_charge"
   })
-  
+
   return settings
 }
 
-export async function saveGatewayProviderSettings(baseUrl: string, storeId: string, apiKey: string, webhookSecret: string) {
+export async function saveGatewayProviderSettings(
+  baseUrl: string,
+  storeId: string,
+  apiKey: string,
+  webhookSecret: string,
+  flow: GatewayFlow = "mock_charge"
+) {
   const admin = await requireAdmin()
   if (admin instanceof NextResponse) return { success: false, message: "Unauthorized" }
 
   const sql = getSqlConnection()
-  
-  // Neon doesn't have an explicit .begin() via default neon() http client without driver. 
+  const safeFlow: GatewayFlow = flow === "stripe" ? "stripe" : "mock_charge"
+
+  // Neon doesn't have an explicit .begin() via default neon() http client without driver.
   // For HTTP neon, we just run the queries sequentially in a Promise.all or one block.
   await Promise.all([
     sql`
-      INSERT INTO store_settings (key, value, updated_at) 
+      INSERT INTO store_settings (key, value, updated_at)
       VALUES ('GATEWAY_BASE_URL', ${baseUrl}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = ${baseUrl}, updated_at = NOW()
     `,
     sql`
-      INSERT INTO store_settings (key, value, updated_at) 
+      INSERT INTO store_settings (key, value, updated_at)
       VALUES ('GATEWAY_STORE_ID', ${storeId}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = ${storeId}, updated_at = NOW()
     `,
     sql`
-      INSERT INTO store_settings (key, value, updated_at) 
+      INSERT INTO store_settings (key, value, updated_at)
       VALUES ('GATEWAY_API_KEY', ${apiKey}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = ${apiKey}, updated_at = NOW()
     `,
     sql`
-      INSERT INTO store_settings (key, value, updated_at) 
+      INSERT INTO store_settings (key, value, updated_at)
       VALUES ('GATEWAY_WEBHOOK_SECRET', ${webhookSecret}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = ${webhookSecret}, updated_at = NOW()
+    `,
+    sql`
+      INSERT INTO store_settings (key, value, updated_at)
+      VALUES ('GATEWAY_FLOW', ${safeFlow}, NOW())
+      ON CONFLICT (key) DO UPDATE SET value = ${safeFlow}, updated_at = NOW()
     `
   ])
 
   revalidatePath("/admin/settings/payments")
+  revalidatePath("/checkout")
   return { success: true }
 }
 

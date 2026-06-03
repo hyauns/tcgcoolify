@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, Save, Link2, KeyRound, Fingerprint } from "lucide-react"
-import { saveGatewayProviderSettings, testGatewayConnection } from "@/app/actions/settings"
+import { saveGatewayProviderSettings, testGatewayConnection, type GatewayFlow } from "@/app/actions/settings"
 
 import { useToast } from "@/hooks/use-toast"
 
@@ -13,6 +13,7 @@ interface ProviderSettings {
   storeId: string
   apiKey: string
   webhookSecret: string
+  flow: GatewayFlow
 }
 
 export function ProviderForm({ initialData }: { initialData: ProviderSettings }) {
@@ -28,7 +29,7 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
     e.preventDefault()
     setIsSaving(true)
     try {
-      await saveGatewayProviderSettings(data.baseUrl, data.storeId, data.apiKey, data.webhookSecret)
+      await saveGatewayProviderSettings(data.baseUrl, data.storeId, data.apiKey, data.webhookSecret, data.flow)
       toast({
         title: "Settings Saved",
         description: "Payment Provider config updated successfully."
@@ -74,6 +75,27 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
+      {/* Payment Mode — selects which gateway flow this storefront uses */}
+      <div className="space-y-1.5">
+        <label className="text-sm font-semibold text-gray-700 flex items-center">
+          <Fingerprint className="w-4 h-4 mr-2 text-gray-400" />
+          Payment Mode
+        </label>
+        <select
+          value={data.flow}
+          onChange={e => setData({ ...data, flow: e.target.value as GatewayFlow })}
+          className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <option value="mock_charge">Mock Charge — direct card (current)</option>
+          <option value="stripe">Stripe Checkout — redirect</option>
+        </select>
+        <p className="text-xs text-gray-500">
+          {data.flow === "stripe"
+            ? "Stripe: the customer is redirected to a secure hosted page. No card data is collected on this storefront. Point Store ID / API Key / Webhook Secret to your Stripe-provider store."
+            : "Mock Charge: the storefront collects the card and charges directly (unchanged). Use for testing."}
+        </p>
+      </div>
+
       <div className="space-y-1.5">
         <label className="text-sm font-semibold text-gray-700 flex items-center">
           <Link2 className="w-4 h-4 mr-2 text-gray-400" />

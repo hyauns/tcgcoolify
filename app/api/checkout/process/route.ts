@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { checkCheckoutRateLimit, getClientIP } from "@/lib/rate-limiter"
 import { getSql } from "@/lib/db-client"
-import { getGatewayProviderSettings } from "@/app/actions/settings"
+import { getGatewayProviderSettings, getGatewayFlow } from "@/app/actions/settings"
 import { sendOrderConfirmation, sendAdminOrderNotification } from "@/lib/email/send-email"
 
 export const dynamic = "force-dynamic"
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { orderId, transactionId, amount, paymentInfo, customerName } = await req.json()
+    const { orderId, transactionId, amount, paymentInfo, customerName, customerEmail } = await req.json()
 
     const config = await getGatewayProviderSettings()
 
@@ -34,6 +34,74 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Gateway configured incorrectly" }, { status: 500 })
     }
 
+    // ── STRIPE FLOW ──────────────────────────────────────────────────────────
+    // When the admin selects Stripe in Payment Settings, defer to the gateway's
+    // /api/gateway/checkout (no card collected here) and return a redirect URL.
+    // The order stays PENDING and is completed later by the gateway webhook.
+    // The mock-charge path below is left completely untouched.
+    const flow = await getGatewayFlow()
+    if (flow === "stripe") {
+      const checkoutEndpoint = config.baseUrl.endsWith("/")
+        ? `${config.baseUrl}api/gateway/checkout`
+        : `${config.baseUrl}/api/gateway/checkout`
+
+      // Resolve a display item name from the order (the gateway masks it anyway).
+      let itemName = "Order"
+      try {
+        const [itemRow] = await sql`SELECT product_name FROM order_items WHERE order_id = ${Number(orderId)} ORDER BY id ASC LIMIT 1`
+        if (itemRow?.product_name) itemName = String(itemRow.product_name)
+      } catch {
+        // non-fatal — fall back to the generic name
+      }
+
+      const checkoutRes = await fetch(checkoutEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Store-ID": config.storeId,
+          "X-API-Key": config.apiKey,
+        },
+        body: JSON.stringify({
+          amount: Number(trueAmount),
+          currency: "USD",
+          itemName,
+          customerEmail: customerEmail || undefined,
+        }),
+      })
+
+      if (!checkoutRes.ok) {
+        console.error(`[checkout-process] Stripe checkout init failed (${checkoutRes.status}) for ${transactionId}`)
+        return NextResponse.json({ error: "Gateway rejected checkout" }, { status: 400 })
+      }
+
+      const checkoutData = await checkoutRes.json()
+      const approvalUrl: string | undefined = checkoutData.approvalUrl || checkoutData.popupUrl
+      const gatewayTxId: string | undefined = checkoutData.transactionId
+
+      if (!approvalUrl) {
+        console.error(`[checkout-process] Stripe checkout returned no approvalUrl for ${transactionId}`)
+        return NextResponse.json({ error: "Gateway did not return a redirect URL" }, { status: 502 })
+      }
+
+      // Sync our local transaction id to the gateway's so the inbound webhook matches.
+      if (gatewayTxId) {
+        await sql`
+          UPDATE payment_transactions
+          SET transaction_id = ${gatewayTxId}
+          WHERE transaction_id = ${transactionId}
+        `
+        console.log(`[checkout-process] Stripe checkout created — synced ${transactionId} -> ${gatewayTxId}`)
+      }
+
+      // Order stays PENDING — the gateway webhook flips it to COMPLETED.
+      return NextResponse.json({
+        success: true,
+        redirectUrl: approvalUrl,
+        transactionId: gatewayTxId ?? transactionId,
+      })
+    }
+
+    // ── MOCK-CHARGE FLOW (unchanged) ─────────────────────────────────────────
     const endpoint = config.baseUrl.endsWith("/")
       ? `${config.baseUrl}api/gateway/mock-charge`
       : `${config.baseUrl}/api/gateway/mock-charge`

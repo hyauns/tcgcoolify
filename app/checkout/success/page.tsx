@@ -60,6 +60,13 @@ type OrderSuccessPayload = {
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const orderNumber = searchParams?.get("orderNumber") ?? null
+  // Stripe redirect flow returns ?transaction_id=&status= instead of ?orderNumber=
+  const transactionId = searchParams?.get("transaction_id") ?? null
+  const lookupQuery = orderNumber
+    ? `orderNumber=${encodeURIComponent(orderNumber)}`
+    : transactionId
+    ? `transactionId=${encodeURIComponent(transactionId)}`
+    : null
   const [orderData, setOrderData] = useState<OrderSuccessPayload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -120,9 +127,9 @@ function CheckoutSuccessContent() {
     async function loadOrder(isManualRefresh = false) {
       if (isManualRefresh) pollAttempts = 0
 
-      if (!orderNumber) {
+      if (!lookupQuery) {
         if (isMounted) {
-          setError("Missing order number.")
+          setError("Missing order reference.")
           setLoading(false)
         }
         return
@@ -130,7 +137,7 @@ function CheckoutSuccessContent() {
 
       try {
         const cacheBuster = Date.now()
-        const response = await fetch(`/api/orders/complete?orderNumber=${encodeURIComponent(orderNumber)}&_t=${cacheBuster}`, {
+        const response = await fetch(`/api/orders/complete?${lookupQuery}&_t=${cacheBuster}`, {
           credentials: "include",
           cache: "no-store",
           headers: {
@@ -203,7 +210,7 @@ function CheckoutSuccessContent() {
         delete (window as any).__retryLoadOrder
       }
     }
-  }, [orderNumber])
+  }, [lookupQuery])
 
   if (loading) {
     return (

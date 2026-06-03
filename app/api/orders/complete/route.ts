@@ -100,6 +100,58 @@ async function getOrderByNumber(orderNumber: string): Promise<OrderRow | null> {
   return (rows[0] as OrderRow) || null
 }
 
+/**
+ * Resolve an order by its gateway transaction id (Stripe redirect flow).
+ * The gateway success page returns ?transaction_id=&status= instead of
+ * ?orderNumber=, so we join payment_transactions to find the order.
+ */
+async function getOrderByTransactionId(transactionId: string): Promise<OrderRow | null> {
+  const sql = getSqlConnection()
+  const rows = await sql`
+    SELECT
+      o.id,
+      o.order_number,
+      o.customer_id,
+      o.status,
+      o.payment_status,
+      o.subtotal,
+      o.tax_amount,
+      o.shipping_amount,
+      o.total_amount,
+      o.shipping_address,
+      o.billing_address,
+      o.tracking_number,
+      o.order_date,
+      o.created_at,
+      c.email AS customer_email,
+      c.user_id AS customer_user_id,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'product_id', oi.product_id,
+            'product_name', oi.product_name,
+            'quantity', oi.quantity,
+            'unit_price', oi.unit_price,
+            'total_price', oi.total_price
+          )
+          ORDER BY oi.id
+        ) FILTER (WHERE oi.id IS NOT NULL),
+        '[]'::json
+      ) AS items
+    FROM orders o
+    JOIN payment_transactions pt ON pt.order_id = o.id::text
+    LEFT JOIN customers c ON c.id::text = o.customer_id
+    LEFT JOIN order_items oi ON oi.order_id = o.id
+    WHERE pt.transaction_id = ${transactionId}
+    GROUP BY o.id, c.email, c.user_id
+    ORDER BY o.id DESC
+    LIMIT 1
+  `
+
+  return (rows[0] as OrderRow) || null
+}
+
 function isSuccessfulOrderStatus(status: string | null | undefined): boolean {
   const normalized = String(status || "").toLowerCase()
   return normalized === "completed" || normalized === "pending" || normalized === "processing"
@@ -212,12 +264,15 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const orderNumber = searchParams.get("orderNumber")
+    const transactionId = searchParams.get("transactionId")
 
-    if (!orderNumber) {
-      return NextResponse.json({ error: "Order number is required" }, { status: 400 })
+    if (!orderNumber && !transactionId) {
+      return NextResponse.json({ error: "Order number or transaction id is required" }, { status: 400 })
     }
 
-    const order = await getOrderByNumber(orderNumber)
+    const order = orderNumber
+      ? await getOrderByNumber(orderNumber)
+      : await getOrderByTransactionId(transactionId as string)
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
