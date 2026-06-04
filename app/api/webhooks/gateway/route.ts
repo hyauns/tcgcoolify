@@ -307,6 +307,55 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Refund (full) ─────────────────────────────────────────────────────────
+    // The gateway emits payment.capture.refunded for BOTH PayPal and Stripe
+    // refunds. Mark the local payment + order as refunded. Idempotency is already
+    // guaranteed by the processed_webhook_events insert above (per event_id), so
+    // a redelivery never double-processes.
+    if (eventName === "payment.capture.refunded") {
+      const { transaction_id } = payload
+
+      if (!transaction_id) {
+        console.error("[gateway-webhook] Missing transaction_id in refund payload")
+        return NextResponse.json({ error: "Missing transaction_id" }, { status: 400 })
+      }
+
+      const sql = getSqlConnection()
+      const existingTxResult = await sql`SELECT * FROM payment_transactions WHERE transaction_id = ${transaction_id}`
+
+      if (existingTxResult.length === 0) {
+        console.warn(`[gateway-webhook] Refund for unknown transaction ${transaction_id} — ack`)
+        return NextResponse.json({ ok: true, message: "Transaction not found locally" }, { status: 200 })
+      }
+
+      const existingTx = existingTxResult[0]
+
+      // payment_transactions.status CHECK allows 'refunded'.
+      await sql`
+        UPDATE payment_transactions
+        SET status = 'refunded'
+        WHERE transaction_id = ${transaction_id}
+      `
+      console.log(`[gateway-webhook] payment_transactions ${transaction_id} -> refunded`)
+
+      // orders.status / payment_status are free-form VARCHAR. Mark the order
+      // cancelled + payment refunded so it leaves the active fulfilment queue.
+      if (existingTx.order_id) {
+        const orderUpdateResult = await sql`
+          UPDATE orders
+          SET payment_status = 'REFUNDED',
+              status = 'CANCELLED'
+          WHERE id = ${Number(existingTx.order_id)}
+          RETURNING id, order_number, payment_status, status
+        `
+        if (orderUpdateResult.length > 0) {
+          console.log(`[gateway-webhook] ✅ Order refunded: id=${orderUpdateResult[0].id}, order_number=${orderUpdateResult[0].order_number}`)
+        } else {
+          console.error(`[gateway-webhook] ⚠️ Refund order update matched 0 rows! order_id=${existingTx.order_id}`)
+        }
+      }
+    }
+
     // Acknowledge receipt broadly
     return NextResponse.json({ ok: true }, { status: 200 })
 
