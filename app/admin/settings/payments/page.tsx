@@ -1,14 +1,14 @@
-import { getPaymentGatewayStatus, getGatewayProviderSettings } from "@/app/actions/settings"
+import { getPaymentGatewayStatus, getGatewayProviderSettingsAll } from "@/app/actions/settings"
 import { PaymentSettingsClient } from "./client"
 import { ProviderForm } from "./provider-form"
 import { ShieldCheck, ShieldAlert, Server } from "lucide-react"
 
 export default async function PaymentSettingsPage() {
   const isGatewayEnabled = await getPaymentGatewayStatus()
-  const providerConfig = await getGatewayProviderSettings()
-  
-  // Checking health based on whether the DB contains the SECRET
-  const isSecretConfigured = !!providerConfig.webhookSecret
+  const providerConfig = await getGatewayProviderSettingsAll()
+
+  // Health badge reflects the ACTIVE flow's secret.
+  const isSecretConfigured = !!providerConfig.credentials[providerConfig.flow].webhookSecret
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tcglore.com"
   const webhookEndpoint = `${siteUrl}/api/webhooks/gateway`
 

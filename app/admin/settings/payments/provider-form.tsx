@@ -4,41 +4,56 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, Save, Link2, KeyRound, Fingerprint } from "lucide-react"
-import { saveGatewayProviderSettings, testGatewayConnection, type GatewayFlow } from "@/app/actions/settings"
+import {
+  saveGatewayProviderSettings,
+  testGatewayConnection,
+  type GatewayFlow,
+  type GatewayCredentials,
+} from "@/app/actions/settings"
 
 import { useToast } from "@/hooks/use-toast"
 
-interface ProviderSettings {
-  baseUrl: string
-  storeId: string
-  apiKey: string
-  webhookSecret: string
+interface ProviderFormData {
   flow: GatewayFlow
+  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials }
 }
 
-export function ProviderForm({ initialData }: { initialData: ProviderSettings }) {
+export function ProviderForm({ initialData }: { initialData: ProviderFormData }) {
   const { toast } = useToast()
-  const [data, setData] = useState(initialData)
+  // `flow` is BOTH the active flow and the credential set currently being
+  // edited. Switching it reveals that flow's saved credentials; Save persists
+  // both sets so edits to either are never lost.
+  const [flow, setFlow] = useState<GatewayFlow>(initialData.flow)
+  const [credentials, setCredentials] = useState(initialData.credentials)
   const [isSaving, setIsSaving] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
-  
+
   const [showApi, setShowApi] = useState(false)
   const [showWebhook, setShowWebhook] = useState(false)
+
+  const current = credentials[flow]
+
+  const setField = (key: keyof GatewayCredentials, value: string) => {
+    setCredentials((prev) => ({
+      ...prev,
+      [flow]: { ...prev[flow], [key]: value },
+    }))
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
     try {
-      await saveGatewayProviderSettings(data.baseUrl, data.storeId, data.apiKey, data.webhookSecret, data.flow)
+      await saveGatewayProviderSettings({ flow, credentials })
       toast({
         title: "Settings Saved",
-        description: "Payment Provider config updated successfully."
+        description: `Saved both flows. Active mode: ${flow === "stripe" ? "Stripe Checkout" : "Mock Charge"}.`,
       })
     } catch (err) {
       toast({
         variant: "destructive",
         title: "Save Failed",
-        description: "An error occurred while saving."
+        description: "An error occurred while saving.",
       })
     } finally {
       setIsSaving(false)
@@ -48,25 +63,25 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
   const handleTest = async () => {
     setIsTesting(true)
     try {
-      const res = await testGatewayConnection(data.baseUrl, data.storeId, data.apiKey)
+      const res = await testGatewayConnection(current.baseUrl, current.storeId, current.apiKey)
       if (res.success) {
         toast({
           title: "Connection Successful",
           description: res.message,
-          className: "bg-green-50 border-green-200 text-green-800"
+          className: "bg-green-50 border-green-200 text-green-800",
         })
       } else {
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: res.message
+          description: res.message,
         })
       }
     } catch (err: any) {
       toast({
         variant: "destructive",
         title: "Connection Error",
-        description: err.message || "Unable to reach the gateway"
+        description: err.message || "Unable to reach the gateway",
       })
     } finally {
       setIsTesting(false)
@@ -75,25 +90,29 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
 
   return (
     <form onSubmit={handleSave} className="space-y-5">
-      {/* Payment Mode — selects which gateway flow this storefront uses */}
+      {/* Payment Mode — selects the active flow AND which credential set to edit */}
       <div className="space-y-1.5">
         <label className="text-sm font-semibold text-gray-700 flex items-center">
           <Fingerprint className="w-4 h-4 mr-2 text-gray-400" />
           Payment Mode
         </label>
         <select
-          value={data.flow}
-          onChange={e => setData({ ...data, flow: e.target.value as GatewayFlow })}
+          value={flow}
+          onChange={(e) => setFlow(e.target.value as GatewayFlow)}
           className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="mock_charge">Mock Charge — direct card (current)</option>
           <option value="stripe">Stripe Checkout — redirect</option>
         </select>
         <p className="text-xs text-gray-500">
-          {data.flow === "stripe"
-            ? "Stripe: the customer is redirected to a secure hosted page. No card data is collected on this storefront. Point Store ID / API Key / Webhook Secret to your Stripe-provider store."
-            : "Mock Charge: the storefront collects the card and charges directly (unchanged). Use for testing."}
+          The credentials below belong to the selected mode. Each mode keeps its own
+          Store ID / API Key / Webhook Secret — switch the dropdown to edit the other
+          mode. Saving stores both sets and makes the selected mode active.
         </p>
+      </div>
+
+      <div className="rounded-md bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-800">
+        Editing credentials for: <strong>{flow === "stripe" ? "Stripe Checkout" : "Mock Charge"}</strong>
       </div>
 
       <div className="space-y-1.5">
@@ -101,11 +120,11 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
           <Link2 className="w-4 h-4 mr-2 text-gray-400" />
           Gateway Base URL
         </label>
-        <Input 
-          required 
-          placeholder="https://your-gateway.com" 
-          value={data.baseUrl}
-          onChange={e => setData({...data, baseUrl: e.target.value})}
+        <Input
+          required
+          placeholder="https://your-gateway.com"
+          value={current.baseUrl}
+          onChange={(e) => setField("baseUrl", e.target.value)}
         />
         <p className="text-xs text-gray-500">The root URL assigned to your Payment Gateway.</p>
       </div>
@@ -115,11 +134,11 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
           <Fingerprint className="w-4 h-4 mr-2 text-gray-400" />
           Gateway Store ID
         </label>
-        <Input 
-          required 
-          placeholder="store_xyz..." 
-          value={data.storeId}
-          onChange={e => setData({...data, storeId: e.target.value})}
+        <Input
+          required
+          placeholder="store_xyz..."
+          value={current.storeId}
+          onChange={(e) => setField("storeId", e.target.value)}
         />
         <p className="text-xs text-gray-500">The unique identifier for your storefront given by the gateway.</p>
       </div>
@@ -131,16 +150,16 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
         </label>
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Input 
+            <Input
               required
-              type={showApi ? "text" : "password"} 
-              placeholder="pk_live_..." 
-              value={data.apiKey}
-              onChange={e => setData({...data, apiKey: e.target.value})}
+              type={showApi ? "text" : "password"}
+              placeholder="pk_live_..."
+              value={current.apiKey}
+              onChange={(e) => setField("apiKey", e.target.value)}
               className="pr-10 font-mono text-sm"
             />
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowApi(!showApi)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -160,16 +179,16 @@ export function ProviderForm({ initialData }: { initialData: ProviderSettings })
           Webhook Secret (HMAC)
         </label>
         <div className="relative max-w-md">
-          <Input 
+          <Input
             required
-            type={showWebhook ? "text" : "password"} 
-            placeholder="whsec_..." 
-            value={data.webhookSecret}
-            onChange={e => setData({...data, webhookSecret: e.target.value})}
+            type={showWebhook ? "text" : "password"}
+            placeholder="whsec_..."
+            value={current.webhookSecret}
+            onChange={(e) => setField("webhookSecret", e.target.value)}
             className="pr-10 font-mono text-sm"
           />
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => setShowWebhook(!showWebhook)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
