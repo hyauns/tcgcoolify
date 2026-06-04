@@ -11,6 +11,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Search, Eye, Download } from "lucide-react"
 
+interface OrderAddress {
+  first_name?: string
+  last_name?: string
+  company?: string | null
+  address_line1?: string
+  address_line2?: string | null
+  city?: string
+  state?: string
+  postal_code?: string
+  country?: string
+  phone?: string | null
+}
+
 interface Order {
   id: string
   order_number?: string
@@ -20,7 +33,46 @@ interface Order {
   created_at: string
   items?: any[]
   shipping?: any
+  shipping_address?: OrderAddress | null
+  billing_address?: OrderAddress | null
+  payment?: {
+    flow: "mock_charge" | "stripe" | null
+    transaction_id: string | null
+    status: string | null
+    card_brand: string | null
+    card_last_4: string | null
+  } | null
   tracking?: string
+}
+
+function AddressBlock({ title, address }: { title: string; address?: OrderAddress | null }) {
+  const hasAddress = Boolean(
+    address && (address.address_line1 || address.city || address.postal_code),
+  )
+  return (
+    <div>
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm">
+        {hasAddress && address ? (
+          <div className="space-y-0.5">
+            {(address.first_name || address.last_name) && (
+              <p className="font-medium">
+                {[address.first_name, address.last_name].filter(Boolean).join(" ")}
+              </p>
+            )}
+            {address.company && <p>{address.company}</p>}
+            {address.address_line1 && <p>{address.address_line1}</p>}
+            {address.address_line2 && <p>{address.address_line2}</p>}
+            <p>{[address.city, address.state, address.postal_code].filter(Boolean).join(", ")}</p>
+            {address.country && <p>{address.country}</p>}
+            {address.phone && <p className="text-gray-500">Phone: {address.phone}</p>}
+          </div>
+        ) : (
+          <p className="text-gray-500">No {title.toLowerCase()} on file.</p>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function OrdersPage() {
@@ -395,6 +447,12 @@ export default function OrdersPage() {
                 </div>
               </div>
 
+              {/* Shipping & Billing Addresses */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <AddressBlock title="Shipping Address" address={selectedOrder.shipping_address} />
+                <AddressBlock title="Billing Address" address={selectedOrder.billing_address} />
+              </div>
+
               {/* Order Items */}
               <div>
                 <h3 className="font-semibold mb-2">Order Items</h3>
@@ -412,6 +470,50 @@ export default function OrdersPage() {
                     <span>Total:</span>
                     <span>{formatCurrency(selectedOrder.total)}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Payment */}
+              <div>
+                <h3 className="font-semibold mb-2">Payment</h3>
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm space-y-1">
+                  {selectedOrder.payment ? (
+                    <>
+                      <p>
+                        <strong>Method:</strong>{" "}
+                        {selectedOrder.payment.flow === "stripe"
+                          ? "Stripe (hosted checkout)"
+                          : selectedOrder.payment.flow === "mock_charge"
+                            ? "Mock Charge (direct card)"
+                            : "Unknown"}
+                      </p>
+                      {selectedOrder.payment.status && (
+                        <p>
+                          <strong>Payment status:</strong> {selectedOrder.payment.status}
+                        </p>
+                      )}
+                      {(selectedOrder.payment.card_brand || selectedOrder.payment.card_last_4) && (
+                        <p>
+                          <strong>Card:</strong>{" "}
+                          {[
+                            selectedOrder.payment.card_brand,
+                            selectedOrder.payment.card_last_4
+                              ? `•••• ${selectedOrder.payment.card_last_4}`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        </p>
+                      )}
+                      {selectedOrder.payment.transaction_id && (
+                        <p className="text-gray-500 break-all">
+                          Txn: {selectedOrder.payment.transaction_id}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-500">No payment transaction on file.</p>
+                  )}
                 </div>
               </div>
 
