@@ -119,13 +119,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 })
     }
 
-    if (process.env.NODE_ENV === "production" && !process.env.TURNSTILE_SECRET_KEY) {
-      console.error("[contact] TURNSTILE_SECRET_KEY is not configured")
-      return NextResponse.json({ error: "Contact form is temporarily unavailable." }, { status: 503 })
-    }
-
-    if (!captchaToken || !(await verifyTurnstileToken(String(captchaToken), clientIP))) {
-      return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 400 })
+    // CAPTCHA is enforced only when Turnstile is configured. When TURNSTILE_SECRET_KEY
+    // is absent the form falls back to rate-limiting alone (5/hour per IP, checked above).
+    // Setting TURNSTILE_SECRET_KEY (+ NEXT_PUBLIC_TURNSTILE_SITE_KEY) re-enables CAPTCHA
+    // automatically with no further code change.
+    if (process.env.TURNSTILE_SECRET_KEY) {
+      if (!captchaToken || !(await verifyTurnstileToken(String(captchaToken), clientIP))) {
+        return NextResponse.json({ error: "Security verification failed. Please try again." }, { status: 400 })
+      }
     }
 
     const safeName = escapeHtml(String(name).trim())

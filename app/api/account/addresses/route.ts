@@ -4,15 +4,14 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getSql } from "@/lib/db-client"
 import { requireSession } from "@/lib/auth-guard"
 import { assertSameOrigin } from "@/lib/csrf"
+import { resolveCustomerIdForUser } from "@/lib/customer"
 
 function getSqlConnection() {
   return getSql()
 }
 
 async function getCustomerIdForUser(userId: string): Promise<string | null> {
-  const sql = getSqlConnection()
-  const [row] = await sql`SELECT id FROM customers WHERE user_id = ${userId} LIMIT 1`
-  return row?.id ? String(row.id) : null
+  return resolveCustomerIdForUser(userId)
 }
 
 export async function GET() {
