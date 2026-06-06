@@ -22,7 +22,7 @@ async function getOrderPayment(orderId: string) {
   try {
     const sql = getSql()
     const rows = await sql`
-      SELECT payment_method_id, transaction_id, status, card_brand, card_last_4
+      SELECT payment_method_id, transaction_id, status, card_brand, card_last_4, gateway_response
       FROM payment_transactions
       WHERE order_id = ${String(orderId)}
       ORDER BY processed_at DESC
@@ -30,8 +30,26 @@ async function getOrderPayment(orderId: string) {
     `
     if (rows.length === 0) return null
     const tx = rows[0] as any
+
+    // Prefer the flow recorded on the transaction at checkout time (orders/create
+    // stores it in gateway_response). Stripe and Shopify are both cardless redirect
+    // flows, so the payment_method_id inference below can't tell them apart — the
+    // stored flow is the authoritative source. Fall back to inference for older
+    // rows that predate the stored flow.
+    let storedFlow: "mock_charge" | "stripe" | "shopify" | null = null
+    try {
+      const gr = typeof tx.gateway_response === "string" ? JSON.parse(tx.gateway_response) : tx.gateway_response
+      const f = gr?.flow
+      if (f === "mock_charge" || f === "stripe" || f === "shopify") storedFlow = f
+    } catch {
+      // ignore — fall back to inference
+    }
+
     return {
-      flow: (tx.payment_method_id ? "mock_charge" : "stripe") as "mock_charge" | "stripe",
+      flow: (storedFlow ?? (tx.payment_method_id ? "mock_charge" : "stripe")) as
+        | "mock_charge"
+        | "stripe"
+        | "shopify",
       transaction_id: tx.transaction_id ?? null,
       status: tx.status ?? null,
       card_brand: tx.card_brand ?? null,

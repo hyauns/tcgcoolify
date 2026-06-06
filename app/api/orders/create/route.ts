@@ -7,6 +7,7 @@ import { getSql } from "@/lib/db-client"
 import { detectCardBrand, encryptPhone, maskPhone, encryptCardNumber, createHash, encryptCvv } from "@/lib/payment-security"
 import { calculateSalesTax } from "@/lib/tax"
 import { calculateShipping } from "@/lib/shipping"
+import { getGatewayFlow } from "@/app/actions/settings"
 
 async function resolveCustomerId(sql: any, userId: string): Promise<string | null> {
   if (!userId || userId === "guest") return null
@@ -378,7 +379,17 @@ export async function POST(request: NextRequest) {
       // payment_method_id NULL (see migration 17).
       {
         const txCustomerId = customerId ?? "guest"
-        const gatewayResponse = JSON.stringify({ source: "checkout" })
+        // Record the active gateway flow on the transaction so the admin order
+        // detail can show the real provider (Stripe vs Shopify vs Mock Charge)
+        // — both stripe and shopify leave payment_method_id NULL, so they can't
+        // be told apart by inference alone. Non-fatal if the lookup fails.
+        let activeFlow: "mock_charge" | "stripe" | "shopify" = "mock_charge"
+        try {
+          activeFlow = await getGatewayFlow()
+        } catch {
+          // keep the default; the admin will fall back to inference
+        }
+        const gatewayResponse = JSON.stringify({ source: "checkout", flow: activeFlow })
         await sql`
           INSERT INTO payment_transactions (
             customer_id, payment_method_id, order_id,

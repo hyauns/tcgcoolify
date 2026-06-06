@@ -36,7 +36,7 @@ interface Order {
   shipping_address?: OrderAddress | null
   billing_address?: OrderAddress | null
   payment?: {
-    flow: "mock_charge" | "stripe" | null
+    flow: "mock_charge" | "stripe" | "shopify" | null
     transaction_id: string | null
     status: string | null
     card_brand: string | null
@@ -483,9 +483,11 @@ export default function OrdersPage() {
                         <strong>Method:</strong>{" "}
                         {selectedOrder.payment.flow === "stripe"
                           ? "Stripe (hosted checkout)"
-                          : selectedOrder.payment.flow === "mock_charge"
-                            ? "Mock Charge (direct card)"
-                            : "Unknown"}
+                          : selectedOrder.payment.flow === "shopify"
+                            ? "Shopify (Shopify Payments)"
+                            : selectedOrder.payment.flow === "mock_charge"
+                              ? "Mock Charge (direct card)"
+                              : "Unknown"}
                       </p>
                       {selectedOrder.payment.status && (
                         <p>
