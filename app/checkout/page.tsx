@@ -1219,11 +1219,27 @@ export default function CheckoutPage() {
 
       const processResult = await processResponse.json().catch(() => ({}))
 
-      // Stripe flow: the gateway returns a redirect URL to its hosted checkout.
-      // The order stays PENDING until the gateway webhook confirms payment.
+      // Hosted redirect flow (Stripe / Shopify): the gateway returns a redirect
+      // URL to its hosted checkout. The order stays PENDING until the gateway
+      // webhook confirms payment.
       if (processResult?.redirectUrl) {
         setPaymentStage(4)
-        window.location.href = processResult.redirectUrl
+        // Redirect WITHOUT leaking the tcglore.com referrer to the hosted
+        // checkout. The hosted page records the Referer / document.referrer as
+        // the order's traffic source (visible in Shopify's Conversion summary),
+        // which links the payment back to this storefront. rel="noreferrer"
+        // strips both, so the payment session shows as direct.
+        const redirectUrl = processResult.redirectUrl as string
+        try {
+          const a = document.createElement("a")
+          a.href = redirectUrl
+          a.rel = "noreferrer"
+          a.style.display = "none"
+          document.body.appendChild(a)
+          a.click()
+        } catch {
+          window.location.href = redirectUrl
+        }
         return
       }
 
