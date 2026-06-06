@@ -274,6 +274,14 @@ const validateStreetAddress = (address: string) => {
     return false
   }
 
+  // Accept USPS PO boxes — e.g. "PO Box 1234", "P.O. Box 1234", "POB 1234",
+  // "Post Office Box 1234". They don't begin with a street number, so they
+  // must be matched separately from the standard street pattern below.
+  const poBoxPattern = /^\s*(p\.?\s*o\.?\s*box|post\s+office\s+box|p\.?\s*o\.?\s*b\b|pob\b)\s*#?\s*\d+\s*$/i
+  if (poBoxPattern.test(trimmedAddress)) {
+    return true
+  }
+
   // Check for at least one number (street number) and one letter (street name)
   const hasNumber = /\d/.test(trimmedAddress)
   const hasLetter = /[a-zA-Z]/.test(trimmedAddress)
