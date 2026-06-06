@@ -34,13 +34,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Gateway configured incorrectly" }, { status: 500 })
     }
 
-    // ── STRIPE FLOW ──────────────────────────────────────────────────────────
-    // When the admin selects Stripe in Payment Settings, defer to the gateway's
-    // /api/gateway/checkout (no card collected here) and return a redirect URL.
+    // ── HOSTED REDIRECT FLOW (Stripe / Shopify) ───────────────────────────────
+    // When the admin selects Stripe OR Shopify in Payment Settings, defer to the
+    // gateway's /api/gateway/checkout (no card collected here) and return a
+    // redirect URL. Both are redirect flows — the gateway decides the actual
+    // processor from the store's provider_type; the storefront behaves the same.
     // The order stays PENDING and is completed later by the gateway webhook.
     // The mock-charge path below is left completely untouched.
     const flow = await getGatewayFlow()
-    if (flow === "stripe") {
+    if (flow === "stripe" || flow === "shopify") {
       const checkoutEndpoint = config.baseUrl.endsWith("/")
         ? `${config.baseUrl}api/gateway/checkout`
         : `${config.baseUrl}/api/gateway/checkout`

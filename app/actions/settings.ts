@@ -57,12 +57,21 @@ export async function togglePaymentGateway(enabled: boolean) {
  *   'stripe'                 — Stripe Checkout redirect via /api/gateway/checkout
  * Stored in store_settings under GATEWAY_FLOW so admins can switch without code.
  */
-export type GatewayFlow = "mock_charge" | "stripe"
+export type GatewayFlow = "mock_charge" | "stripe" | "shopify"
+
+/**
+ * Whitelists a raw GATEWAY_FLOW value to a known flow. Both "stripe" and
+ * "shopify" are hosted REDIRECT flows (the gateway returns an approvalUrl and
+ * the order completes via webhook); anything else defaults to mock_charge.
+ */
+function normalizeFlow(value: unknown): GatewayFlow {
+  return value === "stripe" || value === "shopify" ? value : "mock_charge"
+}
 
 export async function getGatewayFlow(): Promise<GatewayFlow> {
   const sql = getSqlConnection()
   const result = await sql`SELECT value FROM store_settings WHERE key = 'GATEWAY_FLOW'`
-  return result[0]?.value === "stripe" ? "stripe" : "mock_charge"
+  return normalizeFlow(result[0]?.value)
 }
 
 export interface GatewayCredentials {
@@ -77,7 +86,9 @@ export interface GatewayCredentials {
 // "legacy mirror" of whichever flow is active, so any older reader keeps
 // working and pre-upgrade data still resolves via the fallback below.
 function flowSuffix(flow: GatewayFlow): string {
-  return flow === "stripe" ? "STRIPE" : "MOCK_CHARGE"
+  if (flow === "stripe") return "STRIPE"
+  if (flow === "shopify") return "SHOPIFY"
+  return "MOCK_CHARGE"
 }
 
 async function readGatewaySettingsMap(): Promise<Record<string, string>> {
@@ -112,7 +123,7 @@ function resolveFlowCredentials(map: Record<string, string>, flow: GatewayFlow):
  */
 export async function getGatewayProviderSettings() {
   const map = await readGatewaySettingsMap()
-  const flow: GatewayFlow = map["GATEWAY_FLOW"] === "stripe" ? "stripe" : "mock_charge"
+  const flow: GatewayFlow = normalizeFlow(map["GATEWAY_FLOW"])
   return { ...resolveFlowCredentials(map, flow), flow }
 }
 
@@ -122,28 +133,29 @@ export async function getGatewayProviderSettings() {
  */
 export async function getGatewayProviderSettingsAll(): Promise<{
   flow: GatewayFlow
-  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials }
+  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials; shopify: GatewayCredentials }
 }> {
   const map = await readGatewaySettingsMap()
-  const flow: GatewayFlow = map["GATEWAY_FLOW"] === "stripe" ? "stripe" : "mock_charge"
+  const flow: GatewayFlow = normalizeFlow(map["GATEWAY_FLOW"])
   return {
     flow,
     credentials: {
       mock_charge: resolveFlowCredentials(map, "mock_charge"),
       stripe: resolveFlowCredentials(map, "stripe"),
+      shopify: resolveFlowCredentials(map, "shopify"),
     },
   }
 }
 
 export async function saveGatewayProviderSettings(input: {
   flow: GatewayFlow
-  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials }
+  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials; shopify: GatewayCredentials }
 }) {
   const admin = await requireAdmin()
   if (admin instanceof NextResponse) return { success: false, message: "Unauthorized" }
 
   const sql = getSqlConnection()
-  const safeFlow: GatewayFlow = input.flow === "stripe" ? "stripe" : "mock_charge"
+  const safeFlow: GatewayFlow = normalizeFlow(input.flow)
 
   const upsert = (key: string, value: string) => sql`
     INSERT INTO store_settings (key, value, updated_at)
@@ -153,8 +165,8 @@ export async function saveGatewayProviderSettings(input: {
 
   const writes: Promise<unknown>[] = []
 
-  // Persist BOTH flows under their namespaced keys so neither set is lost.
-  ;(["mock_charge", "stripe"] as GatewayFlow[]).forEach((f) => {
+  // Persist ALL flows under their namespaced keys so none is lost.
+  ;(["mock_charge", "stripe", "shopify"] as GatewayFlow[]).forEach((f) => {
     const sfx = flowSuffix(f)
     const c = input.credentials[f]
     writes.push(upsert(`GATEWAY_BASE_URL_${sfx}`, c.baseUrl ?? ""))
@@ -215,7 +227,7 @@ export async function getWebhookSecret() {
    // un-suffixed key and finally the env var. Only one flow is active at a time,
    // so the active flow's secret is the one Paydef signs inbound webhooks with.
    const map = await readGatewaySettingsMap()
-   const flow: GatewayFlow = map["GATEWAY_FLOW"] === "stripe" ? "stripe" : "mock_charge"
+   const flow: GatewayFlow = normalizeFlow(map["GATEWAY_FLOW"])
    return (
      map[`GATEWAY_WEBHOOK_SECRET_${flowSuffix(flow)}`] ||
      map["GATEWAY_WEBHOOK_SECRET"] ||

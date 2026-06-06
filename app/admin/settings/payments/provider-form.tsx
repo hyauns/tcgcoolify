@@ -15,7 +15,13 @@ import { useToast } from "@/hooks/use-toast"
 
 interface ProviderFormData {
   flow: GatewayFlow
-  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials }
+  credentials: { mock_charge: GatewayCredentials; stripe: GatewayCredentials; shopify: GatewayCredentials }
+}
+
+const FLOW_LABELS: Record<GatewayFlow, string> = {
+  mock_charge: "Mock Charge",
+  stripe: "Stripe Checkout",
+  shopify: "Shopify Checkout",
 }
 
 export function ProviderForm({ initialData }: { initialData: ProviderFormData }) {
@@ -47,7 +53,7 @@ export function ProviderForm({ initialData }: { initialData: ProviderFormData })
       await saveGatewayProviderSettings({ flow, credentials })
       toast({
         title: "Settings Saved",
-        description: `Saved both flows. Active mode: ${flow === "stripe" ? "Stripe Checkout" : "Mock Charge"}.`,
+        description: `Saved all flows. Active mode: ${FLOW_LABELS[flow]}.`,
       })
     } catch (err) {
       toast({
@@ -101,8 +107,9 @@ export function ProviderForm({ initialData }: { initialData: ProviderFormData })
           onChange={(e) => setFlow(e.target.value as GatewayFlow)}
           className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          <option value="mock_charge">Mock Charge — direct card (current)</option>
+          <option value="mock_charge">Mock Charge — direct card</option>
           <option value="stripe">Stripe Checkout — redirect</option>
+          <option value="shopify">Shopify Checkout — redirect (Shopify Payments)</option>
         </select>
         <p className="text-xs text-gray-500">
           The credentials below belong to the selected mode. Each mode keeps its own
@@ -112,7 +119,7 @@ export function ProviderForm({ initialData }: { initialData: ProviderFormData })
       </div>
 
       <div className="rounded-md bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-800">
-        Editing credentials for: <strong>{flow === "stripe" ? "Stripe Checkout" : "Mock Charge"}</strong>
+        Editing credentials for: <strong>{FLOW_LABELS[flow]}</strong>
       </div>
 
       <div className="space-y-1.5">

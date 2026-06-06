@@ -411,20 +411,24 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [calculatedTax, setCalculatedTax] = useState<number | null>(null)
   const [isCalculatingTax, setIsCalculatingTax] = useState(false)
-  const [gatewayFlow, setGatewayFlow] = useState<"mock_charge" | "stripe">("mock_charge")
+  const [gatewayFlow, setGatewayFlow] = useState<"mock_charge" | "stripe" | "shopify">("mock_charge")
 
-  // Resolve the active gateway flow (mock_charge | stripe). When Stripe is
-  // active we switch the payment method off "card" so the card form + card
-  // validation are skipped (Stripe collects the card on its hosted page).
+  // Resolve the active gateway flow (mock_charge | stripe | shopify). Both
+  // stripe and shopify are hosted REDIRECT flows, so we switch the payment
+  // method off "card" — the card form + card validation are skipped and the
+  // buyer is redirected to the gateway's hosted page to pay.
   useEffect(() => {
     let cancelled = false
     fetch("/api/checkout/payment-mode")
       .then((r) => r.json())
       .then((d) => {
         if (cancelled) return
-        const flow = d?.flow === "stripe" ? "stripe" : "mock_charge"
+        const raw = d?.flow
+        const flow: "mock_charge" | "stripe" | "shopify" =
+          raw === "stripe" || raw === "shopify" ? raw : "mock_charge"
         setGatewayFlow(flow)
-        setFormData((prev) => ({ ...prev, paymentMethod: flow === "stripe" ? "stripe" : "card" }))
+        const isRedirect = flow !== "mock_charge"
+        setFormData((prev) => ({ ...prev, paymentMethod: isRedirect ? "stripe" : "card" }))
       })
       .catch(() => {})
     return () => {
@@ -742,7 +746,7 @@ export default function CheckoutPage() {
     },
   ]
 
-  const paymentMethods = gatewayFlow === "stripe"
+  const paymentMethods = gatewayFlow !== "mock_charge"
     ? [
         {
           id: "stripe",
@@ -1281,8 +1285,8 @@ export default function CheckoutPage() {
                   </Button>
                 </div>
               </div>
-            ) : gatewayFlow === "stripe" ? (
-              // Stripe redirect state — buyer is about to be sent to the secure hosted page.
+            ) : gatewayFlow !== "mock_charge" ? (
+              // Hosted redirect state (Stripe / Shopify) — buyer is about to be sent to the secure hosted page.
               // (Distinct from the mock-charge stages, which describe a direct card charge.)
               <div className="space-y-5 sm:space-y-6">
                 <div className="relative">
@@ -2046,14 +2050,17 @@ export default function CheckoutPage() {
               </RadioGroup>
             </div>
 
-            {/* Stripe — no card collected here; buyer is redirected to Stripe */}
+            {/* Hosted redirect (Stripe / Shopify) — no card collected here; buyer is redirected to pay */}
             {formData.paymentMethod === "stripe" && (
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 flex items-start gap-3">
                 <CreditCard className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-800">
-                  <p className="font-semibold">Secure payment via Stripe</p>
+                  <p className="font-semibold">
+                    Secure payment via {gatewayFlow === "shopify" ? "Shopify" : "Stripe"}
+                  </p>
                   <p className="mt-0.5 text-blue-700">
-                    After placing your order you'll be redirected to a secure Stripe page to enter your card details.
+                    After placing your order you'll be redirected to a secure{" "}
+                    {gatewayFlow === "shopify" ? "Shopify" : "Stripe"} checkout page to complete payment.
                     Your order is confirmed once payment completes.
                   </p>
                 </div>
