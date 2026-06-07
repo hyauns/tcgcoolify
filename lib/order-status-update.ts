@@ -1,6 +1,6 @@
 import { adminDb } from "@/lib/database"
 import { getSql } from "@/lib/db-client"
-import { sendOrderCancellation } from "@/lib/email/send-email"
+import { sendOrderCancellation, sendOrderRefund } from "@/lib/email/send-email"
 import { getGatewayProviderSettingsAll } from "@/app/actions/settings"
 
 /**
@@ -17,8 +17,13 @@ import { getGatewayProviderSettingsAll } from "@/app/actions/settings"
  * Failures are logged, never thrown: a gateway hiccup must not roll back the
  * local cancellation (same contract as the cancellation email below). The
  * gateway endpoint is itself idempotent, so a retry/redelivery is safe.
+ *
+ * Returns TRUE only when the gateway actually accepted a refund (HTTP 2xx), so
+ * the caller can send the "refunded" email instead of the default cancellation
+ * email. Returns FALSE for every skip/failure path (mock_charge, unpaid, missing
+ * credentials, gateway error) — those keep the default cancellation email.
  */
-async function refundOrderViaGateway(orderId: string): Promise<void> {
+async function refundOrderViaGateway(orderId: string): Promise<boolean> {
   let tx: { payment_method_id: string | null; transaction_id: string | null; status: string | null }
   try {
     const sql = getSql()
@@ -29,29 +34,32 @@ async function refundOrderViaGateway(orderId: string): Promise<void> {
       ORDER BY processed_at DESC
       LIMIT  1
     `
-    if (rows.length === 0) return
+    if (rows.length === 0) return false
     tx = rows[0] as any
   } catch (err) {
     console.error(`[admin-orders] Refund lookup failed for order ${orderId}:`, err)
-    return
+    return false
   }
 
-  // Stripe hosted-checkout stores no local card → payment_method_id is NULL.
-  // The Mock Charge / direct-card flow links a payment_methods row. Mirror the
-  // flow inference in app/api/admin/orders/[id]/route.ts:getOrderPayment.
+  // Stripe / Shopify hosted-checkout stores no local card → payment_method_id is
+  // NULL. The Mock Charge / direct-card flow links a payment_methods row. Mirror
+  // the flow inference in app/api/admin/orders/[id]/route.ts:getOrderPayment.
+  // (Both Stripe AND Shopify gateway orders land here — PayDef routes the refund
+  // to the right provider by the store's provider_type, so this caller is
+  // provider-agnostic.)
   const flow = tx.payment_method_id ? "mock_charge" : "stripe"
-  if (flow !== "stripe") return
-  if (!tx.transaction_id) return
+  if (flow !== "stripe") return false
+  if (!tx.transaction_id) return false
   if (tx.status !== "succeeded") {
     // Nothing captured to refund (pending/failed) or already refunded.
-    return
+    return false
   }
 
   const { credentials } = await getGatewayProviderSettingsAll()
   const creds = credentials.stripe
   if (!creds.baseUrl || !creds.storeId || !creds.apiKey) {
     console.warn(`[admin-orders] Stripe gateway credentials missing — cannot refund order ${orderId}`)
-    return
+    return false
   }
 
   const base = creds.baseUrl.replace(/\/+$/, "")
@@ -68,11 +76,13 @@ async function refundOrderViaGateway(orderId: string): Promise<void> {
     if (!res.ok) {
       const text = await res.text().catch(() => "")
       console.error(`[admin-orders] Gateway refund failed for order ${orderId}: ${res.status} ${text}`)
-      return
+      return false
     }
     console.log(`[admin-orders] Gateway refund requested: order=${orderId} tx=${tx.transaction_id}`)
+    return true
   } catch (err) {
     console.error(`[admin-orders] Gateway refund request threw for order ${orderId}:`, err)
+    return false
   }
 }
 
@@ -103,8 +113,10 @@ export async function applyOrderStatusUpdate(
 
   if (status === "CANCELLED" && prevOrder && prevOrder.status !== "CANCELLED") {
     // Refund first (best-effort) so it runs even when no customer email exists
-    // and the email branch below returns early.
-    await refundOrderViaGateway(id)
+    // and the email branch below returns early. `refunded` is true only when the
+    // gateway actually issued a refund (Stripe/Shopify paid order) — that decides
+    // WHICH email the customer receives.
+    const refunded = await refundOrderViaGateway(id)
 
     const email = prevOrder.customer?.email
     const hasRealEmail = !!email && email !== "No Email" && email.includes("@")
@@ -119,14 +131,27 @@ export async function applyOrderStatusUpdate(
       `#${String(prevOrder.id).slice(-8)}`
     const customerName = prevOrder.customer?.name || "Customer"
     try {
-      await sendOrderCancellation({
-        customerEmail: email,
-        customerName,
-        orderNumber,
-        cancelledAt: new Date(),
-      })
+      if (refunded) {
+        // Money was actually returned → send the friendly "refunded" email
+        // instead of the default fraud-prevention cancellation email.
+        await sendOrderRefund({
+          customerEmail: email,
+          customerName,
+          orderNumber,
+          amount: Number((prevOrder as { total?: number }).total ?? 0),
+          currency: (prevOrder as { currency?: string }).currency || "USD",
+          refundedAt: new Date(),
+        })
+      } else {
+        await sendOrderCancellation({
+          customerEmail: email,
+          customerName,
+          orderNumber,
+          cancelledAt: new Date(),
+        })
+      }
     } catch (emailError) {
-      console.error("[admin-orders] Cancellation email send threw:", emailError)
+      console.error("[admin-orders] Cancellation/refund email send threw:", emailError)
     }
   }
 }

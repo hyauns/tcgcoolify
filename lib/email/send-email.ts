@@ -9,6 +9,7 @@ import { PasswordResetTemplate, getPasswordResetText } from "./templates/passwor
 import { PasswordChangedTemplate, getPasswordChangedText } from "./templates/password-changed"
 import { AdminOrderNotificationTemplate, getAdminOrderNotificationText } from "./templates/admin-order-notification"
 import { OrderCancellationTemplate, getOrderCancellationText } from "./templates/order-cancellation"
+import { OrderRefundTemplate, getOrderRefundText } from "./templates/order-refund"
 
 // Types
 export interface OrderEmailData {
@@ -142,6 +143,52 @@ export async function sendOrderCancellation(
     return result
   } catch (error) {
     console.error("[v0] sendOrderCancellation: failed:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
+}
+
+export async function sendOrderRefund(
+  params: {
+    customerEmail: string
+    customerName: string
+    orderNumber: string
+    amount: number
+    currency?: string
+    refundedAt?: Date
+  },
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  console.log("[v0] sendOrderRefund: attempting to send to:", params.customerEmail)
+  console.log("[v0] sendOrderRefund: orderNumber:", params.orderNumber)
+  try {
+    const refundedAt = params.refundedAt ?? new Date()
+    const currency = params.currency || "USD"
+    const html = await render(
+      OrderRefundTemplate({
+        orderNumber: params.orderNumber,
+        customerName: params.customerName,
+        refundedAt,
+        amount: params.amount,
+        currency,
+      }),
+    )
+    const text = getOrderRefundText({
+      orderNumber: params.orderNumber,
+      customerName: params.customerName,
+      refundedAt,
+      amount: params.amount,
+      currency,
+    })
+
+    const result = await sendEmailWithRetry({
+      to: params.customerEmail,
+      subject: `Your TCG Lore order has been refunded - ${params.orderNumber}`,
+      html,
+      text,
+    })
+    console.log("[v0] sendOrderRefund: Resend result:", result)
+    return result
+  } catch (error) {
+    console.error("[v0] sendOrderRefund: failed:", error)
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }
