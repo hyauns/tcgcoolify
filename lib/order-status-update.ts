@@ -51,47 +51,68 @@ async function refundOrderViaGateway(orderId: string): Promise<boolean> {
     return false
   }
 
-  // Pick the gateway store the order was actually paid through. Stripe AND
+  // Find the gateway store that actually owns this transaction. Stripe AND
   // Shopify orders BOTH have a NULL local payment_method_id, so they are
-  // indistinguishable per-order — the active GATEWAY_FLOW is the provider signal,
-  // and it points at the SAME credentials checkout used. Sending the refund to
-  // the wrong store 404s in PayDef (each transaction is scoped to one store),
-  // which is exactly the bug when a Shopify order was refunded via the Stripe
-  // store. PayDef then routes Stripe-vs-Shopify by the store's provider_type.
-  const { flow, credentials } = await getGatewayProviderSettingsAll()
-  const creds =
-    flow === "shopify" ? credentials.shopify : flow === "stripe" ? credentials.stripe : null
-  if (!creds) {
-    // Active flow is mock_charge (or unknown) → no hosted gateway payment to refund.
-    return false
-  }
-  if (!creds.baseUrl || !creds.storeId || !creds.apiKey) {
-    console.warn(`[admin-orders] ${flow} gateway credentials missing — cannot refund order ${orderId}`)
+  // indistinguishable per-order, and the order's provider is not persisted. We
+  // therefore try every configured HOSTED gateway store (shopify + stripe): in
+  // PayDef each transaction is scoped to exactly one store, so only the owning
+  // store accepts the refund and the others return 404 ("not found for this
+  // store") harmlessly — the transaction_id is a UUID, so there is no risk of
+  // hitting an unrelated payment. PayDef then routes Stripe-vs-Shopify by the
+  // store's provider_type. This is deliberately INDEPENDENT of the active
+  // GATEWAY_FLOW so refunds keep working after the admin switches Payment Mode
+  // (e.g. to mock_charge) — the order was paid under whatever flow was active at
+  // checkout, which may differ from now.
+  const { credentials } = await getGatewayProviderSettingsAll()
+  const seen = new Set<string>()
+  const stores = [credentials.shopify, credentials.stripe].filter((c) => {
+    if (!c.baseUrl || !c.storeId || !c.apiKey) return false
+    const key = `${c.baseUrl.replace(/\/+$/, "")}|${c.storeId}`
+    if (seen.has(key)) return false // same store configured in two slots → call once
+    seen.add(key)
+    return true
+  })
+
+  if (stores.length === 0) {
+    console.warn(`[admin-orders] No hosted gateway credentials configured — cannot refund order ${orderId}`)
     return false
   }
 
-  const base = creds.baseUrl.replace(/\/+$/, "")
-  try {
-    const res = await fetch(`${base}/api/gateway/refund`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Store-ID": creds.storeId,
-        "X-API-Key": creds.apiKey,
-      },
-      body: JSON.stringify({ transaction_id: tx.transaction_id }),
-    })
-    if (!res.ok) {
+  for (const creds of stores) {
+    const base = creds.baseUrl.replace(/\/+$/, "")
+    try {
+      const res = await fetch(`${base}/api/gateway/refund`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Store-ID": creds.storeId,
+          "X-API-Key": creds.apiKey,
+        },
+        body: JSON.stringify({ transaction_id: tx.transaction_id }),
+      })
+      if (res.ok) {
+        console.log(
+          `[admin-orders] Gateway refund requested: order=${orderId} store=${creds.storeId} tx=${tx.transaction_id}`,
+        )
+        return true
+      }
       const text = await res.text().catch(() => "")
-      console.error(`[admin-orders] Gateway refund failed (${flow}) for order ${orderId}: ${res.status} ${text}`)
-      return false
+      // 404 = this store doesn't own the tx → try the next hosted store.
+      console.log(
+        `[admin-orders] Refund not on store ${creds.storeId} (${res.status}) for order ${orderId}: ${text}`,
+      )
+    } catch (err) {
+      console.error(
+        `[admin-orders] Gateway refund request threw for order ${orderId} on store ${creds.storeId}:`,
+        err,
+      )
     }
-    console.log(`[admin-orders] Gateway refund requested (${flow}): order=${orderId} store=${creds.storeId} tx=${tx.transaction_id}`)
-    return true
-  } catch (err) {
-    console.error(`[admin-orders] Gateway refund request threw for order ${orderId}:`, err)
-    return false
   }
+
+  console.error(
+    `[admin-orders] Gateway refund: no hosted store owned tx ${tx.transaction_id} for order ${orderId}`,
+  )
+  return false
 }
 
 /**
