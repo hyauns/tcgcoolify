@@ -42,23 +42,31 @@ async function refundOrderViaGateway(orderId: string): Promise<boolean> {
   }
 
   // Stripe / Shopify hosted-checkout stores no local card → payment_method_id is
-  // NULL. The Mock Charge / direct-card flow links a payment_methods row. Mirror
-  // the flow inference in app/api/admin/orders/[id]/route.ts:getOrderPayment.
-  // (Both Stripe AND Shopify gateway orders land here — PayDef routes the refund
-  // to the right provider by the store's provider_type, so this caller is
-  // provider-agnostic.)
-  const flow = tx.payment_method_id ? "mock_charge" : "stripe"
-  if (flow !== "stripe") return false
+  // NULL. The Mock Charge / direct-card flow links a payment_methods row, and has
+  // no refundable gateway payment.
+  if (tx.payment_method_id) return false
   if (!tx.transaction_id) return false
   if (tx.status !== "succeeded") {
     // Nothing captured to refund (pending/failed) or already refunded.
     return false
   }
 
-  const { credentials } = await getGatewayProviderSettingsAll()
-  const creds = credentials.stripe
+  // Pick the gateway store the order was actually paid through. Stripe AND
+  // Shopify orders BOTH have a NULL local payment_method_id, so they are
+  // indistinguishable per-order — the active GATEWAY_FLOW is the provider signal,
+  // and it points at the SAME credentials checkout used. Sending the refund to
+  // the wrong store 404s in PayDef (each transaction is scoped to one store),
+  // which is exactly the bug when a Shopify order was refunded via the Stripe
+  // store. PayDef then routes Stripe-vs-Shopify by the store's provider_type.
+  const { flow, credentials } = await getGatewayProviderSettingsAll()
+  const creds =
+    flow === "shopify" ? credentials.shopify : flow === "stripe" ? credentials.stripe : null
+  if (!creds) {
+    // Active flow is mock_charge (or unknown) → no hosted gateway payment to refund.
+    return false
+  }
   if (!creds.baseUrl || !creds.storeId || !creds.apiKey) {
-    console.warn(`[admin-orders] Stripe gateway credentials missing — cannot refund order ${orderId}`)
+    console.warn(`[admin-orders] ${flow} gateway credentials missing — cannot refund order ${orderId}`)
     return false
   }
 
@@ -75,10 +83,10 @@ async function refundOrderViaGateway(orderId: string): Promise<boolean> {
     })
     if (!res.ok) {
       const text = await res.text().catch(() => "")
-      console.error(`[admin-orders] Gateway refund failed for order ${orderId}: ${res.status} ${text}`)
+      console.error(`[admin-orders] Gateway refund failed (${flow}) for order ${orderId}: ${res.status} ${text}`)
       return false
     }
-    console.log(`[admin-orders] Gateway refund requested: order=${orderId} tx=${tx.transaction_id}`)
+    console.log(`[admin-orders] Gateway refund requested (${flow}): order=${orderId} store=${creds.storeId} tx=${tx.transaction_id}`)
     return true
   } catch (err) {
     console.error(`[admin-orders] Gateway refund request threw for order ${orderId}:`, err)
